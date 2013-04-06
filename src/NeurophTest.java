@@ -7,21 +7,11 @@ import org.neuroph.util.TransferFunctionType;
 
 public class NeurophTest {
 	
-	private class Concept {
-		
-		public String name;
-		public double[] answers;
-		
-		public Concept(String name, double[] answers) {
-			this.name = name;
-			this.answers = answers;
 
-		}
-	}
 	
 	public NeurophTest()
 	{
-		
+		/*
 		String[] questions = {"Has it ever been alive?", "Is it larger than a hand", "Is it food"};
 		
 		Concept[] concepts = new Concept[8];
@@ -57,6 +47,7 @@ public class NeurophTest {
 			}
 			System.out.println();
 		}
+		*/
 	}
 	
 	private static double[] intToBitArray(int number, int length) {
