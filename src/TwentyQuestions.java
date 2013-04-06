@@ -15,7 +15,7 @@ public class TwentyQuestions {
 	
 	public static void main(String[] args) throws IOException {
 		
-		File inFile = new File("Part1-Input1.in");
+		File inFile = new File("Part1-Input2.in");
 		Scanner in = new Scanner(inFile);
 		TwentyQuestions q20 = read(in);
 		in.close();
