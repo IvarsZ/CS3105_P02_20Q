@@ -21,7 +21,8 @@ public class TwentyQuestions {
 		in.close();
 		q20.train();
 		q20.all();
-		q20.play();
+		q20.testAll();
+		//q20.play();
 	}
 	
 	// TODO move, rename, refactor.
@@ -36,6 +37,22 @@ public class TwentyQuestions {
 			}
 			System.out.println();
 		}
+	}
+	
+	private void testAll() {
+		
+		boolean hasError = false;
+		for (int i = 0; i < concepts.length; i++) {
+			neuralNetwork.setInput(concepts[i].getAnswers());
+			neuralNetwork.calculate();
+			double[] networkOutput = neuralNetwork.getOutput();
+			
+			if (binaryPatternToConceptIndex(networkOutput) != i) {
+				System.out.println("ERROR on: " + concepts[i].getName() + " expected " + i + " actual " + binaryPatternToConceptIndex(networkOutput));
+				hasError = true;
+			}
+		}
+		System.out.println(!hasError);
 	}
 
 	private Concept[] concepts;
@@ -175,7 +192,7 @@ public class TwentyQuestions {
 		return conceptsString;
 	}
 	
-	// TODO add momentum.
+	// TODO add momentum, add support for wrong answers.
 
 	// TODO  explain reverse.
 	private static int binaryPatternToConceptIndex(double bits[]) {
