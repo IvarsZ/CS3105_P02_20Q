@@ -174,6 +174,8 @@ public class TwentyQuestions {
 
 		return conceptsString;
 	}
+	
+	// TODO add momentum.
 
 	// TODO  explain reverse.
 	private static int binaryPatternToConceptIndex(double bits[]) {
