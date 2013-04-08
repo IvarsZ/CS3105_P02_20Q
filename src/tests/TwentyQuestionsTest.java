@@ -1,10 +1,15 @@
+package tests;
 import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import model.TwentyQuestionsModel;
+
 import org.junit.Test;
+
+import View.TwentyQuestionsView;
 
 public class TwentyQuestionsTest {
 
@@ -14,7 +19,7 @@ public class TwentyQuestionsTest {
 		// Read the twenty questions file, train the network and get output.
 		File inFile = new File("Part1-Input1.in");
 		Scanner in = new Scanner(inFile);
-		TwentyQuestionsModel q20Model = TwentyQuestions.read(in);
+		TwentyQuestionsModel q20Model = TwentyQuestionsView.read(in);
 		in.close();
 		q20Model.train();
 
@@ -34,7 +39,7 @@ public class TwentyQuestionsTest {
 		// Read the twenty questions file, train the network and get output.
 		File inFile = new File("Part1-Input2.in");
 		Scanner in = new Scanner(inFile);
-		TwentyQuestionsModel q20Model = TwentyQuestions.read(in);
+		TwentyQuestionsModel q20Model = TwentyQuestionsView.read(in);
 		in.close();
 		q20Model.train();
 

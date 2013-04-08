@@ -1,3 +1,7 @@
+package model;
+import java.util.Arrays;
+
+
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.learning.DataSet;
 import org.neuroph.nnet.MultiLayerPerceptron;
@@ -12,10 +16,10 @@ public class TwentyQuestionsModel {
 	
 	private NeuralNetwork neuralNetwork;
 	
-	private String[] questions;
+	private Question[] questions;
 	private DataSet trainingDataSet;
 	
-	public TwentyQuestionsModel(Concept[] concepts, String[] questions, int hiddenUnitsCount, int maxIterations, double learningRate) {
+	public TwentyQuestionsModel(Concept[] concepts, Question[] questions, int hiddenUnitsCount, int maxIterations, double learningRate) {
 
 		this.concepts = concepts;
 		this.questions = questions;
@@ -38,7 +42,7 @@ public class TwentyQuestionsModel {
 			double[] inputValues = new double[getInputUnitsCount()];
 			double[] outputValues = conceptIndexToBinaryPattern(conceptIndex);
 			for (int i = 0; i < getInputUnitsCount(); i++) {
-				inputValues[i] = concepts[conceptIndex].getAnswer(i);
+				inputValues[i] = concepts[conceptIndex].getAnswer(questions[i]).getValue();
 			}
 
 			trainingDataSet.addRow(inputValues, outputValues);
@@ -46,7 +50,7 @@ public class TwentyQuestionsModel {
 	}
 	
 
-	public String[] getQuestions() {
+	public Question[] getQuestions() {
 		return questions;
 	}
 
@@ -80,12 +84,18 @@ public class TwentyQuestionsModel {
 		
 		double[][] output = new double[concepts.length][];
 		for (int i = 0; i < concepts.length; i++) {
-			neuralNetwork.setInput(concepts[i].getAnswers());
+			
+			Answer[] answers = concepts[i].getAnswers();
+			double[] input = new double[answers.length];
+			for (int j = 0; j < answers.length; j++) {
+				input[j] = answers[j].getValue();
+			}
+			neuralNetwork.setInput(input);
 			neuralNetwork.calculate();
-			output[i] = neuralNetwork.getOutput();
+			output[i] = Arrays.copyOf(neuralNetwork.getOutput(), neuralNetwork.getOutput().length);
 		}
 		
-		return null;
+		return output;
 	}
 	
 	public Concept[] getConcepts() {
