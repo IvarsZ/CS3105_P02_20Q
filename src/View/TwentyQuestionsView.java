@@ -3,6 +3,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.DecimalFormat;
 import java.util.Scanner;
 
 import model.Answer;
@@ -12,13 +13,15 @@ import model.TwentyQuestionsModel;
 
 public class TwentyQuestionsView {
 	
+	private static final DecimalFormat DF = new DecimalFormat("#.##");
+	
 	/**
 	 * TODO separate class.
 	 * Entry point for part1.
 	 */
 	public static void main(String[] args) throws IOException {
 		
-		TwentyQuestionsView q20 = new TwentyQuestionsView("Part1-Input2.in");
+		TwentyQuestionsView q20 = new TwentyQuestionsView("Part1-Input1.in");
 		q20.print();
 		q20.play();
 	}
@@ -80,12 +83,31 @@ public class TwentyQuestionsView {
 	
 	private void print() {
 		
+		System.out.println("Questions: ");
+		Question[] questions = q20Model.getQuestions();
+		for (Question question : questions) {
+			System.out.println(question.getText());
+		}
+		
+		System.out.println("Input, expected and actual output patterns for concepts:");
 		Concept[] concepts = q20Model.getConcepts();
-		double[][] output = q20Model.getOutput();
+		double[][] input = q20Model.getInput();
+		double[][] actualOutput = q20Model.getActualOutput();
+		double[][] expectedOutput = q20Model.getExpectedOutput();
 		for (int i = 0; i < concepts.length; i++) {
+			
 			System.out.print(concepts[i].getName() + ": ");
-			for (int j = 0; j < output[i].length; j++) {
-				System.out.print((int) (output[i][j] + 0.5) + " ");
+			
+			for (int j = 0; j < input[i].length; j++) {
+				System.out.print((int) input[i][j] + " ");
+			}
+			System.out.print(" | ");
+			for (int j = 0; j < expectedOutput[i].length; j++) {
+				System.out.print((int) expectedOutput[i][j] + " ");
+			}
+			System.out.print(" | ");
+			for (int j = 0; j < actualOutput[i].length; j++) {
+				System.out.print(DF.format(actualOutput[i][j]) + " ");
 			}
 			System.out.println();
 		}
