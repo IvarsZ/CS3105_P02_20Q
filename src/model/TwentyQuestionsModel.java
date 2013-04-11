@@ -108,11 +108,16 @@ public class TwentyQuestionsModel {
 		return conceptsString;
 	}
 	
+	/**
+	 * @return an array of required input for each concept.
+	 */
 	public double[][] getInput() {
 		
+		// For each concept,
 		double[][] input = new double[concepts.length][];
 		for (int i = 0; i < concepts.length; i++) {
 			
+			// construct required input array from its answers to questions.
 			Answer[] answers = concepts[i].getAnswers();
 			input[i] = new double[answers.length];
 			for (int j = 0; j < answers.length; j++) {
@@ -123,8 +128,12 @@ public class TwentyQuestionsModel {
 		return input;
 	}
 	
+	/**
+	 * @return an array of values to which the network is trained to for each concept.
+	 */
 	public double[][] getExpectedOutput() {
 		
+		// Initialize the array of output values for each concept by converting its index to binary.
 		double[][] output = new double[concepts.length][];
 		for (int i = 0; i < concepts.length; i++) {
 			output[i] = conceptIndexToBinaryPattern(i);
@@ -133,12 +142,18 @@ public class TwentyQuestionsModel {
 		return output;
 	}
 	
+	/**
+	 * @return an array of actual output values for each concept.
+	 */
 	public double[][] getActualOutput() {
 		
 		double[][] output = new double[concepts.length][];
 		double[][] input = getInput();
+		
+		// For each concept,
 		for (int i = 0; i < concepts.length; i++) {
 			
+			// get its input and calculate actual output.
 			neuralNetwork.setInput(input[i]);
 			neuralNetwork.calculate();
 			output[i] = Arrays.copyOf(neuralNetwork.getOutput(), neuralNetwork.getOutput().length);
@@ -147,6 +162,9 @@ public class TwentyQuestionsModel {
 		return output;
 	}
 
+	/**
+	 * Converts the specified array of binary values to its integer.
+	 */
 	private int binaryPatternToConceptIndex(double bits[]) {
 		
 		int index = 0;
@@ -162,6 +180,9 @@ public class TwentyQuestionsModel {
 		return index;
 	}
 
+	/**
+	 * Converts the specified integer to an array of it binary values.
+	 */
 	private double[] conceptIndexToBinaryPattern(int conceptIndex) {
 
 		int bitCount = getOutputUnitsCount();
@@ -178,10 +199,16 @@ public class TwentyQuestionsModel {
 		return bits;
 	}
 
+	/**
+	 * @return the number of input units.
+	 */
 	private int getInputUnitsCount() {
 		return questions.length;
 	}
 
+	/**
+	 * @return the number of output units.
+	 */
 	private int getOutputUnitsCount() {
 		return (int) Math.ceil((Math.log(concepts.length) / Math.log(2)));
 	}

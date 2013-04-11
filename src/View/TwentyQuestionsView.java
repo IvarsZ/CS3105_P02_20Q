@@ -16,17 +16,6 @@ public class TwentyQuestionsView {
 	private static final DecimalFormat DF = new DecimalFormat("#.##");
 	
 	/**
-	 * TODO separate class.
-	 * Entry point for part1.
-	 */
-	public static void main(String[] args) throws IOException {
-		
-		TwentyQuestionsView q20 = new TwentyQuestionsView("Part1-Input1.in");
-		q20.print();
-		q20.play();
-	}
-	
-	/**
 	 * Reads a twenty questions model from a file.
 	 * 
 	 * @param in - the scanner that reads the file.
@@ -71,6 +60,12 @@ public class TwentyQuestionsView {
 	
 	private TwentyQuestionsModel q20Model;
 	
+	/**
+	 * Constructor for the view of Twenty Questions.
+	 * 
+	 * @param filename - the name of the file used to construct the model of the system.
+	 * @throws IOException
+	 */
 	public TwentyQuestionsView(String filename) throws IOException {
 		
 		// Create the q20 instance from a file and train it.
@@ -81,8 +76,12 @@ public class TwentyQuestionsView {
 		q20Model.train();
 	}
 	
-	private void print() {
+	/**
+	 * Prints the model of the system.
+	 */
+	public void print() {
 		
+		// Print the questions.
 		System.out.println("Questions: ");
 		Question[] questions = q20Model.getQuestions();
 		for (Question question : questions) {
@@ -94,18 +93,26 @@ public class TwentyQuestionsView {
 		double[][] input = q20Model.getInput();
 		double[][] actualOutput = q20Model.getActualOutput();
 		double[][] expectedOutput = q20Model.getExpectedOutput();
+		
+		// For each concept,
 		for (int i = 0; i < concepts.length; i++) {
 			
+			// print its name,
 			System.out.print(concepts[i].getName() + ": ");
 			
+			// input pattern,
 			for (int j = 0; j < input[i].length; j++) {
 				System.out.print((int) input[i][j] + " ");
 			}
 			System.out.print(" | ");
+			
+			// expected output,
 			for (int j = 0; j < expectedOutput[i].length; j++) {
 				System.out.print((int) expectedOutput[i][j] + " ");
 			}
 			System.out.print(" | ");
+			
+			// and actual output.
 			for (int j = 0; j < actualOutput[i].length; j++) {
 				System.out.print(DF.format(actualOutput[i][j]) + " ");
 			}
@@ -113,18 +120,22 @@ public class TwentyQuestionsView {
 		}
 	}
 	
-	private void play() throws IOException {
+	/**
+	 * Plays Twenty Questions with the user.
+	 */
+	public void play() throws IOException {
 
 		System.out.println("Choose a concept from: " + q20Model.conceptsToString());
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		Question[] questions = q20Model.getQuestions();
 		double[] answers = new double[questions.length];
+		
+		// For each question,
 		for (int i = 0; i < questions.length; i++) {
-			
 			
 			System.out.println(questions[i].getText() + " (yes/no)");
 			
-			// Read answer.
+			// read the anwser.
 			Double answer = null;
 			do {
 				String answerInput = in.readLine();
@@ -140,7 +151,7 @@ public class TwentyQuestionsView {
 		}
 		in.close();
 		
-		// Get the answer.
+		// Get the guess.
 		System.out.println(q20Model.guessConcept(answers));
 	}
 }

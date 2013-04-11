@@ -23,6 +23,7 @@ public class TwentyQuestionsTest {
 		in.close();
 		q20Model.train();
 
+		// Check that all concepts are correctly guessed.
 		assertEquals("Pumpkin", q20Model.guessConcept(new double[]{0, 1, 1}));
 		assertEquals("Pig", q20Model.guessConcept(new double[]{1, 1, 1}));
 		assertEquals("Chair", q20Model.guessConcept(new double[]{0, 1, 0}));
@@ -43,6 +44,7 @@ public class TwentyQuestionsTest {
 		in.close();
 		q20Model.train();
 
+		// Check that all concepts are correctly guessed.
 		assertEquals("Pumpkin", q20Model.guessConcept(new double[]{0, 1, 1}));
 		assertEquals("Chair", q20Model.guessConcept(new double[]{0, 1, 0}));
 		assertEquals("Wristwatch", q20Model.guessConcept(new double[]{0, 0, 0}));
