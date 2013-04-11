@@ -1,11 +1,11 @@
 package model;
 import java.util.Arrays;
 
-
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.learning.DataSet;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
+import org.neuroph.nnet.learning.MomentumBackpropagation;
 import org.neuroph.util.TransferFunctionType;
 
 public class TwentyQuestionsModel {
@@ -14,7 +14,7 @@ public class TwentyQuestionsModel {
 	private Concept[] concepts;
 	
 	private NeuralNetwork neuralNetwork;
-	private BackPropagation backProgationRule;
+	private MomentumBackpropagation backProgationRule;
 	private DataSet trainingDataSet;
 	
 	/**
@@ -26,7 +26,7 @@ public class TwentyQuestionsModel {
 	 * @param maxIterations - maximum number of iterations to do when training the network.
 	 * @param learningRate - the learning rate to use when training the network.
 	 */
-	public TwentyQuestionsModel(Concept[] concepts, Question[] questions, int hiddenUnitsCount, int maxIterations, double learningRate) {
+	public TwentyQuestionsModel(Concept[] concepts, Question[] questions, int hiddenUnitsCount, int maxIterations, double learningRate, double momentum) {
 
 		this.concepts = concepts;
 		this.questions = questions;
@@ -39,10 +39,11 @@ public class TwentyQuestionsModel {
 			neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, getInputUnitsCount(), hiddenUnitsCount, getOutputUnitsCount());
 		}
 		
-		// Set the max iterations, learning rate and TODO momentum for the learning rule used by the neural network.
-		backProgationRule = new BackPropagation();
+		// Set the max iterations, learning rate and momentum for the learning rule used by the neural network.
+		backProgationRule = new MomentumBackpropagation();
 		backProgationRule.setMaxIterations(maxIterations);
 		backProgationRule.setLearningRate(learningRate);
+		backProgationRule.setMomentum(momentum);
 
 		// For each concept,
 		trainingDataSet = new DataSet(getInputUnitsCount(), getOutputUnitsCount());

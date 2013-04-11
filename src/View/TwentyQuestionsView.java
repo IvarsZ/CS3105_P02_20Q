@@ -54,8 +54,9 @@ public class TwentyQuestionsView {
 		int hiddenUnitsCount = in.nextInt();
 		int maxIterations = in.nextInt();
 		double learningRate = in.nextInt();
+		double momentum = in.nextInt();
 
-		return new TwentyQuestionsModel(concepts, questions, hiddenUnitsCount, maxIterations, learningRate);
+		return new TwentyQuestionsModel(concepts, questions, hiddenUnitsCount, maxIterations, learningRate, momentum);
 	}
 	
 	private TwentyQuestionsModel q20Model;
