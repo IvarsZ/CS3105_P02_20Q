@@ -135,7 +135,7 @@ public class TwentyQuestionsView {
 			
 			System.out.println(questions[i].getText() + " (yes/no)");
 			
-			// read the anwser.
+			// read the answer.
 			Double answer = null;
 			do {
 				String answerInput = in.readLine();
