@@ -17,6 +17,12 @@ public class TwentyQuestionsModel {
 	private MomentumBackpropagation backProgationRule;
 	private DataSet trainingDataSet;
 	
+	private int maxIterations;
+	private double learningRate;
+	private double momentum;
+	
+	private int lastIterationCount;
+	
 	/**
 	 * Constructor for the model of the Twenty Questions system.
 	 * 
@@ -30,6 +36,10 @@ public class TwentyQuestionsModel {
 
 		this.concepts = concepts;
 		this.questions = questions;
+		
+		this.maxIterations = maxIterations;
+		this.learningRate = learningRate;
+		this.momentum = momentum;
 
 		// Set the hidden unit count if it's positive.
 		if (hiddenUnitsCount < 1) {
@@ -38,12 +48,6 @@ public class TwentyQuestionsModel {
 		else {
 			neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, getInputUnitsCount(), hiddenUnitsCount, getOutputUnitsCount());
 		}
-		
-		// Set the max iterations, learning rate and momentum for the learning rule used by the neural network.
-		backProgationRule = new MomentumBackpropagation();
-		backProgationRule.setMaxIterations(maxIterations);
-		backProgationRule.setLearningRate(learningRate);
-		backProgationRule.setMomentum(momentum);
 
 		// For each concept,
 		trainingDataSet = new DataSet(getInputUnitsCount(), getOutputUnitsCount());
@@ -93,7 +97,18 @@ public class TwentyQuestionsModel {
 	 */
 	public void train() {
 		
+		// Set the max iterations, learning rate and momentum for the learning rule used by the neural network.
+		if (backProgationRule == null) {
+			backProgationRule = new MomentumBackpropagation();
+		}
+		backProgationRule.setMaxIterations(maxIterations);
+		backProgationRule.setLearningRate(learningRate);
+		backProgationRule.setMomentum(momentum);
+		
 		neuralNetwork.learn(trainingDataSet, backProgationRule);
+		
+		// Save the iteration count.
+		lastIterationCount = backProgationRule.getCurrentIteration();
 	}
 	
 	/**
@@ -161,6 +176,25 @@ public class TwentyQuestionsModel {
 		}
 		
 		return output;
+	}
+	
+	/**
+	 * Setter for the training parameters.
+	 */
+	public void setTrainingParameters(double learningRate, double momentum) {
+		this.learningRate = learningRate;
+		this.momentum = momentum;
+	}
+	
+	/**
+	 * @return - the number of iterations during last training.
+	 */
+	public int getLastIterationCount() {
+		return lastIterationCount;
+	}
+	
+	public void resetNetwork() {
+		neuralNetwork.randomizeWeights();
 	}
 
 	/**

@@ -121,6 +121,22 @@ public class TwentyQuestionsView {
 		}
 	}
 	
+	public void experimentWithTrainingParameters() {
+		
+		// For different combinations of learning rate and momemtum values,
+		for (double learningRate = 0.1; learningRate <= 1; learningRate += 0.1) {
+			for (double momentum = 0; momentum <= 1; momentum += 0.1) {
+				
+				// get the iteration count for training from scratch.
+				q20Model.resetNetwork();
+				q20Model.setTrainingParameters(learningRate, momentum);
+				q20Model.train();
+				System.out.print(q20Model.getLastIterationCount() + " ");
+			}
+			System.out.println();
+		}
+	}
+	
 	/**
 	 * Plays Twenty Questions with the user.
 	 */
