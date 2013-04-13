@@ -15,8 +15,8 @@ public class TwentyQuestions {
 		// TODO args for file to use and experimenting.
 		TwentyQuestionsView q20 = new TwentyQuestionsView("Part1-Input1.in");
 		q20.print();
-		//q20.experimentWithTrainingParameters();
-		//q20.writeNetworkToFile("Part1-Output1.net");
+		q20.experimentWithTrainingParameters();
+		q20.writeNetworkToFile("Part1-Output1.net");
 		q20.play();
 	}
 }
