@@ -127,11 +127,16 @@ public class TwentyQuestionsView {
 		for (double learningRate = 0.1; learningRate <= 1; learningRate += 0.1) {
 			for (double momentum = 0; momentum <= 1; momentum += 0.1) {
 				
-				// get the iteration count for training from scratch.
-				q20Model.resetNetwork();
-				q20Model.setTrainingParameters(learningRate, momentum);
-				q20Model.train();
-				System.out.print(q20Model.getLastIterationCount() + " ");
+				// get the averate iteration count for training from scratch.
+				int iterationCount = 0;
+				for (int i = 0; i < 25; i++) {
+					q20Model.resetNetwork();
+					q20Model.setTrainingParameters(learningRate, momentum);
+					q20Model.train();
+					iterationCount += q20Model.getLastIterationCount();
+				}
+				
+				System.out.print(iterationCount/25 + " ");
 			}
 			System.out.println();
 		}

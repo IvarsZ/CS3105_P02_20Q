@@ -63,6 +63,9 @@ public class TwentyQuestionsModel {
 			// Add the values as a training set.
 			trainingDataSet.addRow(inputValues, outputValues);
 		}
+		
+		// Randomize weights.
+		neuralNetwork.randomizeWeights();
 	}
 	
 	/**
@@ -193,6 +196,9 @@ public class TwentyQuestionsModel {
 		return lastIterationCount;
 	}
 	
+	/**
+	 * Resets the weights in the network to random values.
+	 */
 	public void resetNetwork() {
 		neuralNetwork.randomizeWeights();
 	}
