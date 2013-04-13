@@ -10,9 +10,11 @@ public class TwentyQuestions {
 	 */
 	public static void main(String[] args) throws IOException {
 		
-		TwentyQuestionsView q20 = new TwentyQuestionsView("Part1-Input2.in");
+		
+		// TODO args for file to use and experimenting.
+		TwentyQuestionsView q20 = new TwentyQuestionsView("Part1-Input1.in");
 		q20.print();
-		q20.experimentWithTrainingParameters();
-		//q20.play();
+		//q20.experimentWithTrainingParameters();
+		q20.play();
 	}
 }

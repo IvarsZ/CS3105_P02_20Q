@@ -51,4 +51,30 @@ public class TwentyQuestionsTest {
 		assertEquals("Ant", q20Model.guessConcept(new double[]{1, 0, 0}));
 		assertEquals("Oyster", q20Model.guessConcept(new double[]{1, 0, 1}));
 	}
+	
+	/**
+	 * Less questions test.
+	 */
+	@Test
+	public void q20Test3() throws FileNotFoundException {
+		
+		// Read the twenty questions file, train the network and get output.
+		File inFile = new File("Part1-Input3.in");
+		Scanner in = new Scanner(inFile);
+		TwentyQuestionsModel q20Model = TwentyQuestionsView.read(in);
+		in.close();
+		q20Model.train();
+
+		// Check that all concepts are correctly guessed.
+		assertEquals("Wristwatch", q20Model.guessConcept(new double[]{0, 0, 0}));
+		assertEquals("Candy", q20Model.guessConcept(new double[]{0, 0, 1}));
+		assertEquals("Chair", q20Model.guessConcept(new double[]{0, 1, 0}));
+		assertEquals("Pumpkin", q20Model.guessConcept(new double[]{0, 1, 1}));
+		
+		// Even when one of the answers is wrong.
+		assertEquals("Wristwatch", q20Model.guessConcept(new double[]{1, 0, 0}));
+		assertEquals("Candy", q20Model.guessConcept(new double[]{1, 0, 1}));
+		assertEquals("Chair", q20Model.guessConcept(new double[]{1, 1, 0}));
+		assertEquals("Pumpkin", q20Model.guessConcept(new double[]{1, 1, 1}));
+	}
 }
