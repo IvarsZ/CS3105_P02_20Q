@@ -202,6 +202,13 @@ public class TwentyQuestionsModel {
 	public void resetNetwork() {
 		neuralNetwork.randomizeWeights();
 	}
+	
+	/**
+	 * Writes the neural network to the file specified by the filename.
+	 */
+	public void writeNetworkToFile(String fileName) {
+		neuralNetwork.save(fileName);
+	}
 
 	/**
 	 * Converts the specified array of binary values to its integer.

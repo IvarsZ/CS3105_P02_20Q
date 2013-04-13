@@ -176,4 +176,11 @@ public class TwentyQuestionsView {
 		// Get the guess.
 		System.out.println(q20Model.guessConcept(answers));
 	}
+	
+	/**
+	 * Writes the neural network of the model to the file specified by the filename.
+	 */
+	public void writeNetworkToFile(String fileName) {
+		q20Model.writeNetworkToFile(fileName);
+	}
 }
