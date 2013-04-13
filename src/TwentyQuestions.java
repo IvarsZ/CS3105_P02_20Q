@@ -1,6 +1,7 @@
 import java.io.IOException;
 
-import View.TwentyQuestionsView;
+import view.TwentyQuestionsView;
+
 
 
 public class TwentyQuestions {

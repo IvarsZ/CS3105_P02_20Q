@@ -9,7 +9,8 @@ import model.TwentyQuestionsModel;
 
 import org.junit.Test;
 
-import View.TwentyQuestionsView;
+import view.TwentyQuestionsView;
+
 
 public class TwentyQuestionsTest {
 
