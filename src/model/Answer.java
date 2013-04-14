@@ -34,4 +34,11 @@ public class Answer {
 	public double getValue() {
 		return value;
 	}
+
+	/**
+	 * The setter for the value.
+	 */
+	public void setValue(double value) {
+		this.value = value;
+	}
 }

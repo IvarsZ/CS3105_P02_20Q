@@ -21,7 +21,7 @@ public class TwentyQuestionsModel {
 	private int maxIterations;
 	private double learningRate;
 	private double momentum;
-
+	
 	private int lastIterationCount;
 
 	/**
@@ -64,12 +64,12 @@ public class TwentyQuestionsModel {
 	/**
 	 * @return the system's guess of the concept based on the given answers.
 	 */
-	public Concept guessConcept(Answer[] answers) {
+	public Concept guessConcept(ArrayList<Answer> answers) {
 
 		// Get the network output and convert it to a concept index.
-		double[] answerValues = new double[answers.length];
-		for (int i = 0; i < answers.length; i++) {
-			answerValues[i] = answers[i].getValue();
+		double[] answerValues = new double[answers.size()];
+		for (int i = 0; i < answers.size(); i++) {
+			answerValues[i] = answers.get(i).getValue();
 		}
 
 		return guessConcept(answerValues);
@@ -94,7 +94,7 @@ public class TwentyQuestionsModel {
 
 		return concepts.get(conceptIndex);
 	}
-
+	
 	/**
 	 * Trains the neural network of the system.
 	 */
@@ -139,10 +139,10 @@ public class TwentyQuestionsModel {
 		for (int i = 0; i < concepts.size(); i++) {
 
 			// construct required input array from its answers to questions.
-			Answer[] answers = concepts.get(i).getAnswers();
-			input[i] = new double[answers.length];
-			for (int j = 0; j < answers.length; j++) {
-				input[i][j] = answers[j].getValue();
+			ArrayList<Answer> answers = concepts.get(i).getAnswers();
+			input[i] = new double[answers.size()];
+			for (int j = 0; j < answers.size(); j++) {
+				input[i][j] = answers.get(j).getValue();
 			}
 		}
 
@@ -212,7 +212,7 @@ public class TwentyQuestionsModel {
 		neuralNetwork.save(fileName);
 	}
 
-	public void addConcept(String conceptName, Answer[] answers) {
+	public void addConcept(String conceptName, ArrayList<Answer> answers) {
 
 		// Add the concept.
 		Concept concept = new Concept(conceptName, answers);
@@ -236,6 +236,10 @@ public class TwentyQuestionsModel {
 		trainingDataSet.addRow(inputValues, outputValues);
 
 		train();
+	}
+	
+	public boolean timedOut() {
+		return lastIterationCount == maxIterations;
 	}
 
 	/**

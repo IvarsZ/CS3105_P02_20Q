@@ -10,6 +10,7 @@ import java.util.Scanner;
 import model.Answer;
 import model.Concept;
 import model.Question;
+import model.Round;
 import model.TwentyQuestionsModel;
 
 public class TwentyQuestionsView {
@@ -42,9 +43,9 @@ public class TwentyQuestionsView {
 			String name = in.nextLine();
 
 			// and answers for each concept.
-			Answer[] answers = new Answer[questionCount];
+			ArrayList<Answer> answers = new ArrayList<Answer>();
 			for (int answerIndex = 0; answerIndex < questionCount; answerIndex++) {
-				answers[answerIndex] = new Answer(questions[answerIndex], in.nextDouble());
+				answers.add(new Answer(questions[answerIndex], in.nextDouble()));
 			}
 
 			concepts.add(new Concept(name, answers));
@@ -154,32 +155,35 @@ public class TwentyQuestionsView {
 		String playAgain = null;
 		do {
 			
+			// Start a new round of the game.
 			System.out.println("Choose a concept.");
-			Question[] questions = q20Model.getQuestions();
-			Answer[] answers = new Answer[questions.length];
-
-			// For each question,
-			for (int i = 0; i < questions.length; i++) {
-
-				System.out.println(questions[i].getText() + " (yes/no)");
-
-				// read the answer.
-				Double answer = null;
+			Round game = new Round(q20Model);
+				
+			while (game.getGuessedConcept() == null) {
+				
+				// Ask the next question until an appropriate answer is read.
+				Question question = game.nextQuestion();
+				Double answerValue = null;
 				do {
+					System.out.println(question.getText() + " (yes/no)");
+					
 					String answerInput = in.readLine();
 					if (answerInput.equals("yes")) {
-						answer = 1.0;
+						answerValue = 1.0;
 					}
 					else if (answerInput.equals("no")) {
-						answer = 0.0;
+						answerValue = 0.0;
 					}
-				} while (answer == null);
+				} while (answerValue == null);
 
-				answers[i] = new Answer(questions[i], answer);
+				
+				// Add the answer.
+				Answer answer = new Answer(question, answerValue);
+				game.addAnswer(answer);
 			}
 
 			// Get the guess.
-			Concept guessedConcept = q20Model.guessConcept(answers);
+			Concept guessedConcept = game.getGuessedConcept();
 			System.out.println("My guess: " + guessedConcept.getName() +
 					". If it is incorrect, please enter the correct concept, otherwise press enter");
 
@@ -188,7 +192,7 @@ public class TwentyQuestionsView {
 			if (correctConceptName.length() > 0) {
 
 				// add it to the system.
-				q20Model.addConcept(correctConceptName, answers);
+				q20Model.addConcept(correctConceptName, game.getAnswers());
 			}
 			
 			System.out.println("Thank you for playing. Enter yes to play again?");
@@ -203,5 +207,9 @@ public class TwentyQuestionsView {
 	 */
 	public void writeNetworkToFile(String fileName) {
 		q20Model.writeNetworkToFile(fileName);
+	}
+
+	public TwentyQuestionsModel getModel() {
+		return q20Model;
 	}
 }

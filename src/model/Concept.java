@@ -1,5 +1,7 @@
 package model;
 
+import java.util.ArrayList;
+
 /**
  * 
  * A concept recognized by a Twenty Questions system.
@@ -10,7 +12,7 @@ package model;
 public class Concept {
 	
 		private String name;
-		private Answer[] answers;
+		private ArrayList<Answer> answers;
 		
 		/**
 		 * Simple constructor.
@@ -18,7 +20,7 @@ public class Concept {
 		 * @param name - The name of the concept.
 		 * @param answers - The answers of this concept to questions from a Twenty Questions system.
 		 */
-		public Concept(String name, Answer[] answers) {
+		public Concept(String name, ArrayList<Answer> answers) {
 			this.name = name;
 			this.answers = answers;
 		}
@@ -33,7 +35,7 @@ public class Concept {
 		/**
 		 * Getter for the answers of this concept.
 		 */
-		public Answer[] getAnswers() {
+		public ArrayList<Answer> getAnswers() {
 			return answers;
 		}
 		
@@ -41,6 +43,6 @@ public class Concept {
 		 * Getter for an answer to a specific question.
 		 */
 		public Answer getAnswer(Question question) {
-			return answers[question.getId()];
+			return answers.get(question.getId());
 		}
 }
