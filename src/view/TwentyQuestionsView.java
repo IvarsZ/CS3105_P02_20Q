@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import model.Answer;
@@ -12,9 +13,9 @@ import model.Question;
 import model.TwentyQuestionsModel;
 
 public class TwentyQuestionsView {
-	
+
 	private static final DecimalFormat DF = new DecimalFormat("#.##");
-	
+
 	/**
 	 * Reads a twenty questions model from a file.
 	 * 
@@ -34,7 +35,7 @@ public class TwentyQuestionsView {
 
 		// Read the concepts,
 		int conceptCount = in.nextInt();
-		Concept[] concepts = new Concept[conceptCount];
+		ArrayList<Concept> concepts = new ArrayList<Concept>();
 		for (int conceptIndex = 0; conceptIndex < conceptCount; conceptIndex++) {
 
 			in.nextLine();
@@ -46,7 +47,7 @@ public class TwentyQuestionsView {
 				answers[answerIndex] = new Answer(questions[answerIndex], in.nextDouble());
 			}
 
-			concepts[conceptIndex] = new Concept(name, answers);
+			concepts.add(new Concept(name, answers));
 		}
 
 		// Read training parameters.
@@ -58,9 +59,9 @@ public class TwentyQuestionsView {
 
 		return new TwentyQuestionsModel(concepts, questions, hiddenUnitsCount, maxIterations, learningRate, momentum);
 	}
-	
+
 	private TwentyQuestionsModel q20Model;
-	
+
 	/**
 	 * Constructor for the view of Twenty Questions.
 	 * 
@@ -68,7 +69,7 @@ public class TwentyQuestionsView {
 	 * @throws IOException
 	 */
 	public TwentyQuestionsView(String filename) throws IOException {
-		
+
 		// Create the q20 instance from a file and train it.
 		File inFile = new File(filename);
 		Scanner in = new Scanner(inFile);
@@ -76,43 +77,43 @@ public class TwentyQuestionsView {
 		in.close();
 		q20Model.train();
 	}
-	
+
 	/**
 	 * Prints the model of the system.
 	 */
 	public void print() {
-		
+
 		// Print the questions.
 		System.out.println("Questions: ");
 		Question[] questions = q20Model.getQuestions();
 		for (Question question : questions) {
 			System.out.println(question.getText());
 		}
-		
+
 		System.out.println("Input, expected and actual output patterns for concepts:");
-		Concept[] concepts = q20Model.getConcepts();
+		ArrayList<Concept> concepts = q20Model.getConcepts();
 		double[][] input = q20Model.getInput();
 		double[][] actualOutput = q20Model.getActualOutput();
 		double[][] expectedOutput = q20Model.getExpectedOutput();
-		
+
 		// For each concept,
-		for (int i = 0; i < concepts.length; i++) {
-			
+		for (int i = 0; i < concepts.size(); i++) {
+
 			// print its name,
-			System.out.print(concepts[i].getName() + ": ");
-			
+			System.out.print(concepts.get(i).getName() + ": ");
+
 			// input pattern,
 			for (int j = 0; j < input[i].length; j++) {
 				System.out.print((int) input[i][j] + " ");
 			}
 			System.out.print(" | ");
-			
+
 			// expected output,
 			for (int j = 0; j < expectedOutput[i].length; j++) {
 				System.out.print((int) expectedOutput[i][j] + " ");
 			}
 			System.out.print(" | ");
-			
+
 			// and actual output.
 			for (int j = 0; j < actualOutput[i].length; j++) {
 				System.out.print(DF.format(actualOutput[i][j]) + " ");
@@ -120,13 +121,13 @@ public class TwentyQuestionsView {
 			System.out.println();
 		}
 	}
-	
+
 	public void experimentWithTrainingParameters() {
-		
+
 		// For different combinations of learning rate and momemtum values,
 		for (double learningRate = 0.1; learningRate <= 1; learningRate += 0.1) {
 			for (double momentum = 0; momentum <= 1; momentum += 0.1) {
-				
+
 				// get the averate iteration count for training from scratch.
 				int iterationCount = 0;
 				for (int i = 0; i < 25; i++) {
@@ -135,13 +136,13 @@ public class TwentyQuestionsView {
 					q20Model.train();
 					iterationCount += q20Model.getLastIterationCount();
 				}
-				
+
 				System.out.print(iterationCount/25 + " ");
 			}
 			System.out.println();
 		}
 	}
-	
+
 	/**
 	 * Plays Twenty Questions with the user.
 	 */
@@ -150,13 +151,13 @@ public class TwentyQuestionsView {
 		System.out.println("Choose a concept from: " + q20Model.conceptsToString());
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		Question[] questions = q20Model.getQuestions();
-		double[] answers = new double[questions.length];
-		
+		Answer[] answers = new Answer[questions.length];
+
 		// For each question,
 		for (int i = 0; i < questions.length; i++) {
-			
+
 			System.out.println(questions[i].getText() + " (yes/no)");
-			
+
 			// read the answer.
 			Double answer = null;
 			do {
@@ -168,15 +169,25 @@ public class TwentyQuestionsView {
 					answer = 0.0;
 				}
 			} while (answer == null);
-			
-			answers[i] = answer;
+
+			answers[i] = new Answer(questions[i], answer);
+		}
+
+		// Get the guess.
+		Concept guessedConcept = q20Model.guessConcept(answers);
+		System.out.println("My guess: " + guessedConcept.getName() +
+				". If it is incorrect, please enter the correct concept, otherwise press enter");
+
+		// If the guess was incorrect and a concept entered,
+		String correctConceptName = in.readLine();
+		if (correctConceptName.length() > 0) {
+
+			// add it to the system.
+			q20Model.addConcept(correctConceptName, answers);
 		}
 		in.close();
-		
-		// Get the guess.
-		System.out.println(q20Model.guessConcept(answers));
 	}
-	
+
 	/**
 	 * Writes the neural network of the model to the file specified by the filename.
 	 */
