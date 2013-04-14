@@ -17,6 +17,7 @@ public class TwentyQuestionsModel {
 	private MomentumBackpropagation backProgationRule;
 	private DataSet trainingDataSet;
 
+	private int hiddenUnitsCount;
 	private int maxIterations;
 	private double learningRate;
 	private double momentum;
@@ -37,35 +38,13 @@ public class TwentyQuestionsModel {
 		this.concepts = concepts;
 		this.questions = questions;
 
+		this.hiddenUnitsCount = hiddenUnitsCount;
 		this.maxIterations = maxIterations;
 		this.learningRate = learningRate;
 		this.momentum = momentum;
 
-		// Set the hidden unit count if it's positive.
-		if (hiddenUnitsCount < 1) {
-			neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, questions.length, getOutputUnitsCount());
-		}
-		else {
-			neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, getInputUnitsCount(), hiddenUnitsCount, getOutputUnitsCount());
-		}
-
-		// For each concept,
-		trainingDataSet = new DataSet(getInputUnitsCount(), getOutputUnitsCount());
-		for (int conceptIndex = 0; conceptIndex < concepts.size(); conceptIndex++) {
-
-			// calculate its output values from the index and input values from the answers.
-			double[] outputValues = conceptIndexToBinaryPattern(conceptIndex);
-			double[] inputValues = new double[getInputUnitsCount()];
-			for (int i = 0; i < getInputUnitsCount(); i++) {
-				inputValues[i] = concepts.get(conceptIndex).getAnswer(questions[i]).getValue();
-			}
-
-			// Add the values as a training set.
-			trainingDataSet.addRow(inputValues, outputValues);
-		}
-
-		// Randomize weights.
-		neuralNetwork.randomizeWeights();
+		// Create the network.
+		initializeNetwork();
 	}
 
 	/**
@@ -105,14 +84,14 @@ public class TwentyQuestionsModel {
 		neuralNetwork.calculate();
 		double[] networkOutput = neuralNetwork.getOutput();
 		int conceptIndex = binaryPatternToConceptIndex(networkOutput);
-		
+
 		// If the concept is not in the system,
 		while (conceptIndex >= concepts.size()) {
-			
+
 			// reduce the index by half, thereby picking a similar existing concept.
 			conceptIndex /= 2;
 		}
-		
+
 		return concepts.get(conceptIndex);
 	}
 
@@ -128,7 +107,7 @@ public class TwentyQuestionsModel {
 		backProgationRule.setMaxIterations(maxIterations);
 		backProgationRule.setLearningRate(learningRate);
 		backProgationRule.setMomentum(momentum);
-		
+
 		backProgationRule.setMaxError(0.0001);
 
 		neuralNetwork.learn(trainingDataSet, backProgationRule);
@@ -235,20 +214,64 @@ public class TwentyQuestionsModel {
 
 	public void addConcept(String conceptName, Answer[] answers) {
 
+		// Add the concept.
 		Concept concept = new Concept(conceptName, answers);
 		concepts.add(concept);
 
-		// calculate its output values from the index and input values from the answers.
+		// Calculate its output values from the index and input values from the answers.
 		double[] outputValues = conceptIndexToBinaryPattern(concepts.size() - 1);
 		double[] inputValues = new double[getInputUnitsCount()];
 		for (int i = 0; i < getInputUnitsCount(); i++) {
 			inputValues[i] = concepts.get(concepts.size() - 1).getAnswer(questions[i]).getValue();
 		}
 
+		// If there's too many concepts
+		while (concepts.size() > Math.pow(2, neuralNetwork.getOutputsCount())) {
+
+			// recreate the network.
+			initializeNetwork();
+		}
+
 		// Add the values as a training set.
 		trainingDataSet.addRow(inputValues, outputValues);
-		
+
 		train();
+	}
+
+	/**
+	 * Creates the used neural network.
+	 */
+	private void initializeNetwork() {
+
+		// Set the hidden unit count if it's positive.
+		if (hiddenUnitsCount < 1) {
+			neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, questions.length, getOutputUnitsCount());
+		}
+		else {
+			neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, getInputUnitsCount(), hiddenUnitsCount, getOutputUnitsCount());
+		}
+
+		// Randomize weights and create a training set for the network.
+		neuralNetwork.randomizeWeights();
+		initializeTrainingSet();
+	}
+
+	private void initializeTrainingSet() {
+
+		// For each concept,
+		trainingDataSet = new DataSet(getInputUnitsCount(), getOutputUnitsCount());
+		for (int conceptIndex = 0; conceptIndex < concepts.size(); conceptIndex++) {
+
+			// calculate its output values from the index and input values from the answers.
+			double[] outputValues = conceptIndexToBinaryPattern(conceptIndex);
+			double[] inputValues = new double[getInputUnitsCount()];
+			for (int i = 0; i < getInputUnitsCount(); i++) {
+				inputValues[i] = concepts.get(conceptIndex).getAnswer(questions[i]).getValue();
+			}
+
+			// Add the values as a training set.
+			trainingDataSet.addRow(inputValues, outputValues);
+		}
 	}
 
 	/**
