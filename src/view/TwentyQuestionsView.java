@@ -29,9 +29,9 @@ public class TwentyQuestionsView {
 		// Read the questions.
 		int questionCount = in.nextInt();
 		in.nextLine();
-		Question[] questions = new Question[questionCount];
+		ArrayList<Question> questions = new ArrayList<Question>();
 		for (int i = 0; i <  questionCount; i++) {
-			questions[i] = new Question(in.nextLine(), i);
+			questions.add(new Question(in.nextLine(), i));
 		}
 
 		// Read the concepts,
@@ -45,7 +45,7 @@ public class TwentyQuestionsView {
 			// and answers for each concept.
 			ArrayList<Answer> answers = new ArrayList<Answer>();
 			for (int answerIndex = 0; answerIndex < questionCount; answerIndex++) {
-				answers.add(new Answer(questions[answerIndex], in.nextDouble()));
+				answers.add(new Answer(questions.get(answerIndex), in.nextDouble()));
 			}
 
 			concepts.add(new Concept(name, answers));
@@ -86,7 +86,7 @@ public class TwentyQuestionsView {
 
 		// Print the questions.
 		System.out.println("Questions: ");
-		Question[] questions = q20Model.getQuestions();
+		ArrayList<Question> questions = q20Model.getQuestions();
 		for (Question question : questions) {
 			System.out.println(question.getText());
 		}
@@ -187,12 +187,25 @@ public class TwentyQuestionsView {
 			System.out.println("My guess: " + guessedConcept.getName() +
 					". If it is incorrect, please enter the correct concept, otherwise press enter");
 
-			// If the guess was incorrect and a concept entered,
+			// If the guess was incorrect and a concept entered.
 			String correctConceptName = in.readLine();
 			if (correctConceptName.length() > 0) {
-
+				
 				// add it to the system.
-				q20Model.addConcept(correctConceptName, game.getAnswers());
+				Concept addedConcept = q20Model.addConcept(correctConceptName, game.getAnswers());
+
+				// If there is a clash between concepts,
+				if (!game.isGuessUnsure()) {
+					
+					// ask the user to add an extra question separating them.
+					System.out.println("Please enter a question such that " +
+									    guessedConcept.getName() + " has answer no, while " +
+										correctConceptName + " has answer yes.");
+					String question = in.readLine();
+					
+					// Add the question.
+					q20Model.addQuestion(question, guessedConcept, addedConcept);
+				}
 			}
 			
 			System.out.println("Thank you for playing. Enter yes to play again?");

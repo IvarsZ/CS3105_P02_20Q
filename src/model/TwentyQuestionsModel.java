@@ -10,7 +10,7 @@ import org.neuroph.util.TransferFunctionType;
 
 public class TwentyQuestionsModel {
 
-	private Question[] questions;
+	private ArrayList<Question> questions;
 	private ArrayList<Concept> concepts;
 
 	private NeuralNetwork neuralNetwork;
@@ -33,7 +33,7 @@ public class TwentyQuestionsModel {
 	 * @param maxIterations - maximum number of iterations to do when training the network.
 	 * @param learningRate - the learning rate to use when training the network.
 	 */
-	public TwentyQuestionsModel(ArrayList<Concept> concepts, Question[] questions, int hiddenUnitsCount, int maxIterations, double learningRate, double momentum) {
+	public TwentyQuestionsModel(ArrayList<Concept> concepts, ArrayList<Question> questions, int hiddenUnitsCount, int maxIterations, double learningRate, double momentum) {
 
 		this.concepts = concepts;
 		this.questions = questions;
@@ -50,7 +50,7 @@ public class TwentyQuestionsModel {
 	/**
 	 * Getter for the questions of the system.
 	 */
-	public Question[] getQuestions() {
+	public ArrayList<Question> getQuestions() {
 		return questions;
 	}
 
@@ -212,7 +212,7 @@ public class TwentyQuestionsModel {
 		neuralNetwork.save(fileName);
 	}
 
-	public void addConcept(String conceptName, ArrayList<Answer> answers) {
+	public Concept addConcept(String conceptName, ArrayList<Answer> answers) {
 
 		// Add the concept.
 		Concept concept = new Concept(conceptName, answers);
@@ -222,7 +222,7 @@ public class TwentyQuestionsModel {
 		double[] outputValues = conceptIndexToBinaryPattern(concepts.size() - 1);
 		double[] inputValues = new double[getInputUnitsCount()];
 		for (int i = 0; i < getInputUnitsCount(); i++) {
-			inputValues[i] = concepts.get(concepts.size() - 1).getAnswer(questions[i]).getValue();
+			inputValues[i] = concepts.get(concepts.size() - 1).getAnswer(questions.get(i)).getValue();
 		}
 
 		// If there's too many concepts
@@ -236,10 +236,17 @@ public class TwentyQuestionsModel {
 		trainingDataSet.addRow(inputValues, outputValues);
 
 		train();
+		
+		return concept;
 	}
 	
 	public boolean timedOut() {
 		return lastIterationCount == maxIterations;
+	}
+	
+	public void addQuestion(String question, Concept guessedConcept, Concept addedConcept) {
+		
+		// TODO add question.
 	}
 
 	/**
@@ -249,7 +256,7 @@ public class TwentyQuestionsModel {
 
 		// Set the hidden unit count if it's positive.
 		if (hiddenUnitsCount < 1) {
-			neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, questions.length, getOutputUnitsCount());
+			neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, questions.size(), getOutputUnitsCount());
 		}
 		else {
 			neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, getInputUnitsCount(), hiddenUnitsCount, getOutputUnitsCount());
@@ -270,7 +277,7 @@ public class TwentyQuestionsModel {
 			double[] outputValues = conceptIndexToBinaryPattern(conceptIndex);
 			double[] inputValues = new double[getInputUnitsCount()];
 			for (int i = 0; i < getInputUnitsCount(); i++) {
-				inputValues[i] = concepts.get(conceptIndex).getAnswer(questions[i]).getValue();
+				inputValues[i] = concepts.get(conceptIndex).getAnswer(questions.get(i)).getValue();
 			}
 
 			// Add the values as a training set.
@@ -319,7 +326,7 @@ public class TwentyQuestionsModel {
 	 * @return the number of input units.
 	 */
 	private int getInputUnitsCount() {
-		return questions.length;
+		return questions.size();
 	}
 
 	/**
