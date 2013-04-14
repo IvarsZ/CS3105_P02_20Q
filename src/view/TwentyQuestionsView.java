@@ -148,43 +148,53 @@ public class TwentyQuestionsView {
 	 */
 	public void play() throws IOException {
 
-		System.out.println("Choose a concept from: " + q20Model.conceptsToString());
+		
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-		Question[] questions = q20Model.getQuestions();
-		Answer[] answers = new Answer[questions.length];
 
-		// For each question,
-		for (int i = 0; i < questions.length; i++) {
+		String playAgain = null;
+		do {
+			
+			System.out.println("Choose a concept.");
+			Question[] questions = q20Model.getQuestions();
+			Answer[] answers = new Answer[questions.length];
 
-			System.out.println(questions[i].getText() + " (yes/no)");
+			// For each question,
+			for (int i = 0; i < questions.length; i++) {
 
-			// read the answer.
-			Double answer = null;
-			do {
-				String answerInput = in.readLine();
-				if (answerInput.equals("yes")) {
-					answer = 1.0;
-				}
-				else if (answerInput.equals("no")) {
-					answer = 0.0;
-				}
-			} while (answer == null);
+				System.out.println(questions[i].getText() + " (yes/no)");
 
-			answers[i] = new Answer(questions[i], answer);
-		}
+				// read the answer.
+				Double answer = null;
+				do {
+					String answerInput = in.readLine();
+					if (answerInput.equals("yes")) {
+						answer = 1.0;
+					}
+					else if (answerInput.equals("no")) {
+						answer = 0.0;
+					}
+				} while (answer == null);
 
-		// Get the guess.
-		Concept guessedConcept = q20Model.guessConcept(answers);
-		System.out.println("My guess: " + guessedConcept.getName() +
-				". If it is incorrect, please enter the correct concept, otherwise press enter");
+				answers[i] = new Answer(questions[i], answer);
+			}
 
-		// If the guess was incorrect and a concept entered,
-		String correctConceptName = in.readLine();
-		if (correctConceptName.length() > 0) {
+			// Get the guess.
+			Concept guessedConcept = q20Model.guessConcept(answers);
+			System.out.println("My guess: " + guessedConcept.getName() +
+					". If it is incorrect, please enter the correct concept, otherwise press enter");
 
-			// add it to the system.
-			q20Model.addConcept(correctConceptName, answers);
-		}
+			// If the guess was incorrect and a concept entered,
+			String correctConceptName = in.readLine();
+			if (correctConceptName.length() > 0) {
+
+				// add it to the system.
+				q20Model.addConcept(correctConceptName, answers);
+			}
+			
+			System.out.println("Thank you for playing. Enter yes to play again?");
+			playAgain = in.readLine();
+			
+		} while (playAgain.equals("yes"));
 		in.close();
 	}
 
