@@ -52,4 +52,9 @@ public class Concept {
 		public Answer getAnswer(Question question) {
 			return answers.get(question.getId());
 		}
+
+		public boolean clashes(Concept guessedConcept) {
+			// TODO Auto-generated method stub
+			return false;
+		}
 }

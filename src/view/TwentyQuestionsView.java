@@ -16,6 +16,9 @@ import model.TwentyQuestionsModel;
 public class TwentyQuestionsView {
 
 	private static final int EXPERIMENT_ITERATION_COUNT = 25;
+	
+	private static final int PLAY_AGAIN_QUESTION_ID = -1;
+	private static final int IS_GUESS_CORRECT_QUESTION_ID = -2;
 
 	private static final DecimalFormat DF = new DecimalFormat("#.##");
 
@@ -88,6 +91,7 @@ public class TwentyQuestionsView {
 		// TODO implement.
 	}
 
+	// TODO move elsewhere.
 	public void experimentWithTrainingParameters() {
 
 		// For different combinations of learning rate and momemtum values,
@@ -114,95 +118,63 @@ public class TwentyQuestionsView {
 	 */
 	public void play() throws IOException {
 
-		// TODO split, refactor whatever...
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-
-		String playAgain = null;
+		
+		Answer playAgainAnswer = null;
 		do {
 
 			// Start a new round of the game.
 			System.out.println("Choose a concept.");
 			Round game = new Round(q20Model);
-
-			while (game.getGuessedConcept() == null) {
-
-				// Ask the next question until an appropriate answer is read.
+			
+			// While the system has more questions,
+			while (!game.hasMoreQuestions()) {
+				
+				// ask the next question and record the answer.
 				Question question = game.nextQuestion();
-				Double answerValue = null;
-				do {
-					System.out.println(question.getText() + " (yes/no)");
-
-					String answerInput = in.readLine();
-					if (answerInput.equals("yes")) {
-						answerValue = 1.0;
-					}
-					else if (answerInput.equals("no")) {
-						answerValue = 0.0;
-					}
-				} while (answerValue == null);
-
-
-				// Add the answer.
-				Answer answer = new Answer(question, answerValue);
+				Answer answer = readAnswer(question, in);
 				game.addAnswer(answer);
+				
+				// If the game has a new guess,
+				if (game.hasNewGuess()) {
+					
+					// output it.
+					System.out.println("My guess is " + game.getGuessedConcept().getName() + ".");
+					
+					// If the guess is correct,
+					Question isGuessCorrectQuestion = new Question("Is my guess correct?", IS_GUESS_CORRECT_QUESTION_ID);
+					if (readAnswer(isGuessCorrectQuestion, in).getValue() == TwentyQuestionsModel.YES) {
+						
+						// mark it and stop the game.
+						game.setGuessCorrect(true);
+						break;
+					}
+				}
+			}
+			
+			// If the system did not guess the concept,
+			if (!game.isGuessCorrect()) {
+			
+				// ask the user to enter it and add it.
+				String conceptName = readText("What was the concept?", in);
+				Concept addedConcept = q20Model.addConcept(conceptName, game.getAnswers());
+			
+				// If the added concept clashes with the last guessed concept,
+				if (addedConcept.clashes(game.getGuessedConcept())) {
+			
+					// ask the user to enter a question and add it.
+					String questionText = readText("Please enter a question such that " +
+							game.getGuessedConcept().getName() + " has answer no, while " +
+							addedConcept.getName() + " has answer yes.", in);
+					q20Model.addQuestion(questionText, game.getGuessedConcept(), addedConcept);
+				}
 			}
 
-			// Get the guess.
-			Concept guessedConcept = game.getGuessedConcept();
-			System.out.println("My guess: " + guessedConcept.getName() +
-					". If it is incorrect, please enter the correct concept, otherwise press enter");
-
-			// If the guess was incorrect and a concept entered.
-			String correctConceptName = in.readLine();
-			if (correctConceptName.length() > 0) {
-
-				// Ask extra questions.
-				Question nextQuestion;
-				while ((nextQuestion = game.nextQuestion()) != null) {
-
-					// Ask the next question until an appropriate answer is read.
-					Double answerValue = null;
-					do {
-						System.out.println(nextQuestion.getText() + " (yes/no)");
-
-						String answerInput = in.readLine();
-						if (answerInput.equals("yes")) {
-							answerValue = 1.0;
-						}
-						else if (answerInput.equals("no")) {
-							answerValue = 0.0;
-						}
-					} while (answerValue == null);
-
-					// Add the answer.
-					Answer answer = new Answer(nextQuestion, answerValue);
-					game.addAnswer(answer);
-				}
-
-				// TODO after asking.
-				// add it to the system.
-				Concept addedConcept = q20Model.addConcept(correctConceptName, game.getAnswers());
-
-				// If there is a clash between concepts,
-				if (!game.isGuessUnsure()) {
-
-					// ask the user to add an extra question separating them.
-					System.out.println("Please enter a question such that " +
-							guessedConcept.getName() + " has answer no, while " +
-							correctConceptName + " has answer yes.");
-					String question = in.readLine();
-
-					// Add the question.
-					q20Model.addQuestion(question, guessedConcept, addedConcept);
-				}
-
-				System.out.println(q20Model.timedOut());
-			}
-
-			System.out.println("Thank you for playing. Enter yes to play again?");
-			playAgain = in.readLine();
-
-		} while (playAgain.equals("yes"));
+			// Ask the user to play again.
+			Question playAgainQuestion = new Question("Play again?", PLAY_AGAIN_QUESTION_ID);
+			playAgainAnswer = readAnswer(playAgainQuestion, in);
+		} while (playAgainAnswer.getValue() == TwentyQuestionsModel.YES);
+		
 		in.close();
 	}
 
@@ -215,5 +187,36 @@ public class TwentyQuestionsView {
 
 	public TwentyQuestionsModel getModel() {
 		return q20Model;
+	}
+	
+	private Answer readAnswer(Question question, BufferedReader in) throws IOException {
+		
+		Double answerValue = null;
+		do {
+			
+			System.out.println(question.getText() + " (yes/no)");
+			String answerText = in.readLine();
+			if (answerText.equals("yes") || answerText.equals("y")) {
+				answerValue = TwentyQuestionsModel.YES;
+			}
+			else if (answerText.equals("no") || answerText.equals("n")) {
+				answerValue = TwentyQuestionsModel.NO;
+			}
+			
+		} while (answerValue == null);
+		
+		return new Answer(question, answerValue);
+	}
+	
+	private String readText(String question, BufferedReader in) throws IOException {
+		
+		System.out.println(question);
+		String text = "";
+		do {
+			
+			text = in.readLine();
+		} while (text.length() <= 0);
+		
+		return text;
 	}
 }

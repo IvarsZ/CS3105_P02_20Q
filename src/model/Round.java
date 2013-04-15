@@ -10,10 +10,17 @@ public class Round {
 	private Concept guessedConcept;
 	private int nextQuestionId;
 	
+	private boolean hasNewGuess;
+	
+	private boolean isGuessCorrect;
+	
 	public Round(TwentyQuestionsModel model) {
 		
 		this.model = model;
 		this.answers = new ArrayList<Answer>();
+		
+		isGuessCorrect = false;
+		hasNewGuess = false;
 	}
 	
 	public Question nextQuestion() {
@@ -28,11 +35,18 @@ public class Round {
 	
 	public void addAnswer(Answer answer) {
 		
+		hasNewGuess = false;
+		
 		answers.add(answer);
 		
 		ArrayList<Concept> possibleConcepts = model.possibleConcepts(answers);
 		if (possibleConcepts.size() == 1) {
-			guessedConcept = possibleConcepts.get(0);
+			
+			if (!possibleConcepts.get(0).equals(guessedConcept)) {
+				
+				guessedConcept = possibleConcepts.get(0);
+				hasNewGuess = true;
+			}
 		}
 	}
 	
@@ -44,19 +58,21 @@ public class Round {
 		return answers;
 	}
 	
-	public boolean isGuessUnsure() {
+	public boolean hasMoreQuestions() {
 		
-		// TODO update?
-		
-		// TODO refactor, is slow why?
-		for (int i = 0; i < answers.size(); i++) {
-			
-			if (guessedConcept.getAnswer(answers.get(i).getQuestion()).getValue() != answers.get(i).getValue()) {
-				
-				return true;
-			}
-		}
-		
-		return false;
+		// TODO proper implementation.
+		return nextQuestionId >= model.getQuestions().size();
+	}
+
+	public boolean hasNewGuess() {
+		return hasNewGuess;
+	}
+
+	public boolean isGuessCorrect() {
+		return isGuessCorrect;
+	}
+
+	public void setGuessCorrect(boolean isGuessCorrect) {
+		this.isGuessCorrect = isGuessCorrect;
 	}
 }

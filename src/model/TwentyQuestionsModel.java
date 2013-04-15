@@ -12,8 +12,9 @@ public class TwentyQuestionsModel {
 	
 	private static final double MAX_TOTAL_ERROR = 0.0001;
 	
-	private static final double NO = 0;
-	private static final double YES = 1;
+	public static final double NO = 0;
+	public static final double YES = 1;
+	
 	private static final double UNANSWERED = 0.5; // TODO is it okay to have both equal?
 	private static final double UNKNOWN = 0.5;
 
