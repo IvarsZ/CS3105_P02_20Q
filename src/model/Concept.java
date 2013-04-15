@@ -53,8 +53,19 @@ public class Concept {
 			return answers.get(question.getId());
 		}
 
-		public boolean clashes(Concept guessedConcept) {
-			// TODO Auto-generated method stub
-			return false;
+		public boolean clashes(Concept concept) {
+			
+			// For each answer,
+			for (int i = 0; i < answers.size(); i++) {
+				
+				// if the known answers are different,
+				if (answers.get(i).getValue() != TwentyQuestionsModel.UNKNOWN && concept.getAnswer(answers.get(i).getQuestion()).getValue() != answers.get(i).getValue()) {
+					
+					// there is no clash.
+					return false;
+				}
+			}
+			
+			return true;
 		}
 }

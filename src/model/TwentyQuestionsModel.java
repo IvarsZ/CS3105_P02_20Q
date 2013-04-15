@@ -16,7 +16,7 @@ public class TwentyQuestionsModel {
 	public static final double YES = 1;
 	
 	private static final double UNANSWERED = 0.5; // TODO is it okay to have both equal?
-	private static final double UNKNOWN = 0.5;
+	public static final double UNKNOWN = 0.5;
 
 	private ArrayList<Question> questions;
 	private ArrayList<Concept> concepts;

@@ -128,10 +128,10 @@ public class TwentyQuestionsView {
 			Round game = new Round(q20Model);
 			
 			// While the system has more questions,
-			while (!game.hasMoreQuestions()) {
+			Question question;
+			while ((question = game.nextQuestion()) != null) {
 				
 				// ask the next question and record the answer.
-				Question question = game.nextQuestion();
 				Answer answer = readAnswer(question, in);
 				game.addAnswer(answer);
 				
