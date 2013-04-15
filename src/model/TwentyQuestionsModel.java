@@ -9,6 +9,8 @@ import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.MomentumBackpropagation;
 import org.neuroph.util.TransferFunctionType;
 
+import sun.security.krb5.Asn1Exception;
+
 public class TwentyQuestionsModel {
 
 	private ArrayList<Question> questions;
@@ -62,10 +64,40 @@ public class TwentyQuestionsModel {
 		return concepts;
 	}
 
+	public ArrayList<Concept> possibleConcepts(ArrayList<Answer> answers) {
+		
+		ArrayList<Concept> possibleConcepts = new ArrayList<Concept>();
+
+		// Get the network output and convert it to a concept index.
+		double[] answerValues = new double[getInputUnitsCount()];
+		for (int i = 0; i < answerValues.length; i++) {
+			answerValues[i] = 0.5; // TODO magic constants.
+		}
+		
+		for (int i = 0; i < answers.size(); i++) {
+			answerValues[answers.get(i).getQuestion().getId()] = answers.get(i).getValue();
+		}
+		
+		neuralNetwork.setInput(answerValues);
+		neuralNetwork.calculate();
+		double[] networkOutput = neuralNetwork.getOutput();
+		
+		for (int i = 0; i < networkOutput.length; i++) {
+			
+			if (networkOutput[i] >= 0.5) {
+				possibleConcepts.add(concepts.get(i));
+			}
+		}
+		
+		// TODO what if no answer.
+		return possibleConcepts;
+	}
+
 	/**
 	 * @return the system's guess of the concept based on the given answers.
 	 */
 	public Concept guessConcept(ArrayList<Answer> answers) {
+
 
 		// Get the network output and convert it to a concept index.
 		double[] answerValues = new double[answers.size()];
@@ -84,7 +116,7 @@ public class TwentyQuestionsModel {
 		neuralNetwork.setInput(answerValues);
 		neuralNetwork.calculate();
 		double[] networkOutput = neuralNetwork.getOutput();
-		int conceptIndex = binaryPatternToConceptIndex(networkOutput);
+		int conceptIndex = 0; // TODO binaryPatternToConceptIndex(networkOutput);
 
 		// If the concept is not in the system,
 		while (conceptIndex >= concepts.size()) {
@@ -158,7 +190,7 @@ public class TwentyQuestionsModel {
 		// Initialize the array of output values for each concept by converting its index to binary.
 		double[][] output = new double[concepts.size()][];
 		for (int i = 0; i < concepts.size(); i++) {
-			output[i] = conceptIndexToBinaryPattern(i);
+			// TODO output[i] = conceptIndexToBinaryPattern(i);
 		}
 
 		return output;
@@ -219,6 +251,10 @@ public class TwentyQuestionsModel {
 		Concept concept = new Concept(conceptName, answers);
 		concepts.add(concept);
 
+		initializeNetwork();
+		train();
+
+		/*
 		// Calculate its output values from the index and input values from the answers.
 		double[] outputValues = conceptIndexToBinaryPattern(concepts.size() - 1);
 		double[] inputValues = new double[getInputUnitsCount()];
@@ -235,8 +271,9 @@ public class TwentyQuestionsModel {
 
 		// Add the values as a training set.
 		trainingDataSet.addRow(inputValues, outputValues);
-		
+
 		train();
+		 */
 
 		return concept;
 	}
@@ -266,7 +303,7 @@ public class TwentyQuestionsModel {
 				concept.addAnswer(new Answer(question, 0.5));
 			}
 		}
-		
+
 		// Recreate the network and retrain.
 		initializeNetwork();
 		train();
@@ -287,14 +324,20 @@ public class TwentyQuestionsModel {
 
 		// Randomize weights and create a training set for the network.
 		neuralNetwork.randomizeWeights();
-		initializeTrainingSet();
+		initializeTrainingSets();
 	}
 
-	private void initializeTrainingSet() {
+	private void initializeTrainingSets() {
 
+		trainingDataSet = new DataSet(getInputUnitsCount(), getOutputUnitsCount());
+		initializeTrainingSet(new double[getInputUnitsCount()], 0);
+
+		/*
 		// For each concept,
 		trainingDataSet = new DataSet(getInputUnitsCount(), getOutputUnitsCount());
 		for (int conceptIndex = 0; conceptIndex < concepts.size(); conceptIndex++) {
+
+
 
 			// calculate its output values from the index and input values from the answers.
 			double[] outputValues = conceptIndexToBinaryPattern(conceptIndex);
@@ -307,10 +350,11 @@ public class TwentyQuestionsModel {
 			// Add the values as a training set.
 			trainingDataSet.addRow(inputValues, outputValues);
 		}
-		
+		 */
+
 		// TODO remove.
 		for (DataSetRow row : trainingDataSet.getRows()) {
-			
+
 			for (double d : row.getInput()) {
 				System.out.print(d + " ");
 			}
@@ -322,41 +366,45 @@ public class TwentyQuestionsModel {
 		}
 	}
 
-	/**
-	 * Converts the specified array of binary values to its integer.
-	 */
-	private int binaryPatternToConceptIndex(double bits[]) {
+	private void initializeTrainingSet(double[] input, int indexToPermute) {
 
-		int index = 0;
-		int pow2 = 1;
-		for (int i = 0; i < bits.length; i++) {
-			if (bits[i] >= 0.5) {
-				index += pow2;
+		// If there is nothing left to permute,
+		if (indexToPermute >= input.length) {
+
+			// add a training set.
+			double[] output = new double[getOutputUnitsCount()];
+			for (int i = 0; i < getOutputUnitsCount(); i++) {
+				if (canMatch(input, concepts.get(i))) {
+					output[i] = 1;
+				}
+				else {
+					output[i] = 0;
+				}
 			}
-
-			pow2 *= 2;
+			trainingDataSet.addRow(input, output);
+			return;
 		}
 
-		return index;
+		// Otherwise permute the entry at the given index and make a recursive call.
+		for (double d = 0; d <= 1; d += 0.5) {
+
+			double[] permutatedInput = Arrays.copyOf(input, input.length);
+			permutatedInput[indexToPermute] = d;
+			initializeTrainingSet(permutatedInput, indexToPermute + 1);
+		}
 	}
 
-	/**
-	 * Converts the specified integer to an array of it binary values.
-	 */
-	private double[] conceptIndexToBinaryPattern(int conceptIndex) {
+	private boolean canMatch(double[] input, Concept concept) {
 
-		int bitCount = getOutputUnitsCount();
-		double[] bits = new double[bitCount];
+		for (int i = 0; i < input.length; i++) {
 
-		// Bits are read from right to match the binaryPatternToConceptIndex method.
-		for (int i = bitCount - 1; i >= 0; i--) {
-
-			if ((conceptIndex & (1 << i)) != 0) {
-				bits[i] = 1;
+			double answerValue = concept.getAnswer(questions.get(i)).getValue();
+			if ((input[i] == 1 && answerValue == 0) || (input[i] == 0 && answerValue == 1)) {
+				return false;
 			}
 		}
 
-		return bits;
+		return true;
 	}
 
 	/**
@@ -370,6 +418,6 @@ public class TwentyQuestionsModel {
 	 * @return the number of output units.
 	 */
 	private int getOutputUnitsCount() {
-		return (int) Math.ceil((Math.log(concepts.size()) / Math.log(2)));
+		return concepts.size();
 	}
 }

@@ -32,9 +32,9 @@ public class Round {
 		
 		answers.add(answer);
 		
-		// TODO add early guesses.
-		if (answers.size() == model.getQuestions().size()) {
-			guessedConcept = model.guessConcept(answers);
+		ArrayList<Concept> possibleConcepts = model.possibleConcepts(answers);
+		if (possibleConcepts.size() == 1) {
+			guessedConcept = possibleConcepts.get(0);
 		}
 	}
 	
@@ -47,6 +47,8 @@ public class Round {
 	}
 	
 	public boolean isGuessUnsure() {
+		
+		// TODO update?
 		
 		// TODO refactor, is slow why?
 		for (int i = 0; i < answers.size(); i++) {
