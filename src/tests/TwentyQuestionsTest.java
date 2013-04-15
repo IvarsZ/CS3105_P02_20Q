@@ -19,6 +19,8 @@ import view.TwentyQuestionsView;
 
 public class TwentyQuestionsTest {
 
+	// TODO tests.
+	/*
 	@Test
 	public void q20Test1() throws FileNotFoundException {
 
@@ -57,10 +59,12 @@ public class TwentyQuestionsTest {
 		assertEquals("Ant", q20Model.guessConcept(new double[]{1, 0, 0}).getName());
 		assertEquals("Oyster", q20Model.guessConcept(new double[]{1, 0, 1}).getName());
 	}
+	*/
 
 	/**
 	 * Less questions test.
 	 */
+	/*
 	@Test
 	public void q20Test3() throws FileNotFoundException {
 
@@ -161,5 +165,6 @@ public class TwentyQuestionsTest {
 		assertEquals("Human", q20Model.guessConcept(new double[]{1, 1, 0, 0}).getName());
 		assertEquals("Human", q20Model.guessConcept(new double[]{1, 1, 0, 1}).getName());
 	}
+	*/
 
 }

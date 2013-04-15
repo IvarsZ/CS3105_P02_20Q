@@ -15,6 +15,8 @@ import model.TwentyQuestionsModel;
 
 public class TwentyQuestionsView {
 
+	private static final int EXPERIMENT_ITERATION_COUNT = 25;
+	
 	private static final DecimalFormat DF = new DecimalFormat("#.##");
 
 	/**
@@ -76,51 +78,14 @@ public class TwentyQuestionsView {
 		Scanner in = new Scanner(inFile);
 		q20Model = read(in);
 		in.close();
-		q20Model.train();
 	}
 
 	/**
 	 * Prints the model of the system.
 	 */
 	public void print() {
-
-		// Print the questions.
-		System.out.println("Questions: ");
-		ArrayList<Question> questions = q20Model.getQuestions();
-		for (Question question : questions) {
-			System.out.println(question.getText());
-		}
-
-		System.out.println("Input, expected and actual output patterns for concepts:");
-		ArrayList<Concept> concepts = q20Model.getConcepts();
-		double[][] input = q20Model.getInput();
-		double[][] actualOutput = q20Model.getActualOutput();
-		double[][] expectedOutput = q20Model.getExpectedOutput();
-
-		// For each concept,
-		for (int i = 0; i < concepts.size(); i++) {
-
-			// print its name,
-			System.out.print(concepts.get(i).getName() + ": ");
-
-			// input pattern,
-			for (int j = 0; j < input[i].length; j++) {
-				System.out.print(input[i][j] + " ");
-			}
-			System.out.print(" | ");
-
-			// expected output,
-			for (int j = 0; j < expectedOutput[i].length; j++) {
-				System.out.print((int) expectedOutput[i][j] + " ");
-			}
-			System.out.print(" | ");
-
-			// and actual output.
-			for (int j = 0; j < actualOutput[i].length; j++) {
-				System.out.print(DF.format(actualOutput[i][j]) + " ");
-			}
-			System.out.println();
-		}
+		
+		// TODO implement.
 	}
 
 	public void experimentWithTrainingParameters() {
@@ -129,16 +94,16 @@ public class TwentyQuestionsView {
 		for (double learningRate = 0.1; learningRate <= 1; learningRate += 0.1) {
 			for (double momentum = 0; momentum <= 1; momentum += 0.1) {
 
-				// get the averate iteration count for training from scratch.
+				// get the average iteration count for training from scratch.
 				int iterationCount = 0;
 				for (int i = 0; i < 25; i++) {
-					q20Model.resetNetwork();
+					
 					q20Model.setTrainingParameters(learningRate, momentum);
-					q20Model.train();
+					q20Model.resetNetwork();
 					iterationCount += q20Model.getLastIterationCount();
 				}
 
-				System.out.print(iterationCount/25 + " ");
+				System.out.print(iterationCount/EXPERIMENT_ITERATION_COUNT + " ");
 			}
 			System.out.println();
 		}
