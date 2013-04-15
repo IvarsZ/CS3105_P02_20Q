@@ -2,8 +2,6 @@ package model;
 
 import java.util.ArrayList;
 
-import sun.security.krb5.Asn1Exception;
-
 public class Round {
 	
 	private TwentyQuestionsModel model;

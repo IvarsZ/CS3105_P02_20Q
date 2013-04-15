@@ -16,7 +16,7 @@ import model.TwentyQuestionsModel;
 public class TwentyQuestionsView {
 
 	private static final int EXPERIMENT_ITERATION_COUNT = 25;
-	
+
 	private static final DecimalFormat DF = new DecimalFormat("#.##");
 
 	/**
@@ -84,7 +84,7 @@ public class TwentyQuestionsView {
 	 * Prints the model of the system.
 	 */
 	public void print() {
-		
+
 		// TODO implement.
 	}
 
@@ -97,7 +97,7 @@ public class TwentyQuestionsView {
 				// get the average iteration count for training from scratch.
 				int iterationCount = 0;
 				for (int i = 0; i < 25; i++) {
-					
+
 					q20Model.setTrainingParameters(learningRate, momentum);
 					q20Model.resetNetwork();
 					iterationCount += q20Model.getLastIterationCount();
@@ -114,24 +114,24 @@ public class TwentyQuestionsView {
 	 */
 	public void play() throws IOException {
 
-		
+		// TODO split, refactor whatever...
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
 		String playAgain = null;
 		do {
-			
+
 			// Start a new round of the game.
 			System.out.println("Choose a concept.");
 			Round game = new Round(q20Model);
-				
+
 			while (game.getGuessedConcept() == null) {
-				
+
 				// Ask the next question until an appropriate answer is read.
 				Question question = game.nextQuestion();
 				Double answerValue = null;
 				do {
 					System.out.println(question.getText() + " (yes/no)");
-					
+
 					String answerInput = in.readLine();
 					if (answerInput.equals("yes")) {
 						answerValue = 1.0;
@@ -141,7 +141,7 @@ public class TwentyQuestionsView {
 					}
 				} while (answerValue == null);
 
-				
+
 				// Add the answer.
 				Answer answer = new Answer(question, answerValue);
 				game.addAnswer(answer);
@@ -155,30 +155,53 @@ public class TwentyQuestionsView {
 			// If the guess was incorrect and a concept entered.
 			String correctConceptName = in.readLine();
 			if (correctConceptName.length() > 0) {
-				
+
+				// Ask extra questions.
+				Question nextQuestion;
+				while ((nextQuestion = game.nextQuestion()) != null) {
+
+					// Ask the next question until an appropriate answer is read.
+					Double answerValue = null;
+					do {
+						System.out.println(nextQuestion.getText() + " (yes/no)");
+
+						String answerInput = in.readLine();
+						if (answerInput.equals("yes")) {
+							answerValue = 1.0;
+						}
+						else if (answerInput.equals("no")) {
+							answerValue = 0.0;
+						}
+					} while (answerValue == null);
+
+					// Add the answer.
+					Answer answer = new Answer(nextQuestion, answerValue);
+					game.addAnswer(answer);
+				}
+
 				// TODO after asking.
 				// add it to the system.
 				Concept addedConcept = q20Model.addConcept(correctConceptName, game.getAnswers());
 
 				// If there is a clash between concepts,
 				if (!game.isGuessUnsure()) {
-					
+
 					// ask the user to add an extra question separating them.
 					System.out.println("Please enter a question such that " +
-									    guessedConcept.getName() + " has answer no, while " +
-										correctConceptName + " has answer yes.");
+							guessedConcept.getName() + " has answer no, while " +
+							correctConceptName + " has answer yes.");
 					String question = in.readLine();
-					
+
 					// Add the question.
 					q20Model.addQuestion(question, guessedConcept, addedConcept);
 				}
-				
+
 				System.out.println(q20Model.timedOut());
 			}
-			
+
 			System.out.println("Thank you for playing. Enter yes to play again?");
 			playAgain = in.readLine();
-			
+
 		} while (playAgain.equals("yes"));
 		in.close();
 	}
