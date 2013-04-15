@@ -105,7 +105,7 @@ public class TwentyQuestionsView {
 
 			// input pattern,
 			for (int j = 0; j < input[i].length; j++) {
-				System.out.print((int) input[i][j] + " ");
+				System.out.print(input[i][j] + " ");
 			}
 			System.out.print(" | ");
 
@@ -191,6 +191,7 @@ public class TwentyQuestionsView {
 			String correctConceptName = in.readLine();
 			if (correctConceptName.length() > 0) {
 				
+				// TODO after asking.
 				// add it to the system.
 				Concept addedConcept = q20Model.addConcept(correctConceptName, game.getAnswers());
 
@@ -206,6 +207,8 @@ public class TwentyQuestionsView {
 					// Add the question.
 					q20Model.addQuestion(question, guessedConcept, addedConcept);
 				}
+				
+				System.out.println(q20Model.timedOut());
 			}
 			
 			System.out.println("Thank you for playing. Enter yes to play again?");

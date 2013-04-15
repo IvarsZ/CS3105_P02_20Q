@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.learning.DataSet;
+import org.neuroph.core.learning.DataSetRow;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.MomentumBackpropagation;
 import org.neuroph.util.TransferFunctionType;
@@ -21,7 +22,7 @@ public class TwentyQuestionsModel {
 	private int maxIterations;
 	private double learningRate;
 	private double momentum;
-	
+
 	private int lastIterationCount;
 
 	/**
@@ -94,7 +95,7 @@ public class TwentyQuestionsModel {
 
 		return concepts.get(conceptIndex);
 	}
-	
+
 	/**
 	 * Trains the neural network of the system.
 	 */
@@ -234,19 +235,41 @@ public class TwentyQuestionsModel {
 
 		// Add the values as a training set.
 		trainingDataSet.addRow(inputValues, outputValues);
-
-		train();
 		
+		train();
+
 		return concept;
 	}
-	
+
 	public boolean timedOut() {
 		return lastIterationCount == maxIterations;
 	}
-	
-	public void addQuestion(String question, Concept guessedConcept, Concept addedConcept) {
+
+	public void addQuestion(String questionText, Concept guessedConcept, Concept addedConcept) {
+
+		// Add question.
+		int questionId = questions.size();
+		questions.add(new Question(questionText, questionId));
+		Question question = questions.get(questionId);
+
+		// For each concept,
+		for (Concept concept : concepts) {
+
+			// add an answer to the added question.
+			if (concept == guessedConcept) {
+				concept.addAnswer(new Answer(question, 0));
+			}
+			else if (concept == addedConcept) {
+				concept.addAnswer(new Answer(question, 1));
+			}
+			else {
+				concept.addAnswer(new Answer(question, 0.5));
+			}
+		}
 		
-		// TODO add question.
+		// Recreate the network and retrain.
+		initializeNetwork();
+		train();
 	}
 
 	/**
@@ -275,13 +298,27 @@ public class TwentyQuestionsModel {
 
 			// calculate its output values from the index and input values from the answers.
 			double[] outputValues = conceptIndexToBinaryPattern(conceptIndex);
-			double[] inputValues = new double[getInputUnitsCount()];
-			for (int i = 0; i < getInputUnitsCount(); i++) {
-				inputValues[i] = concepts.get(conceptIndex).getAnswer(questions.get(i)).getValue();
+			ArrayList<Answer> answers = concepts.get(conceptIndex).getAnswers();
+			double[] inputValues = new double[answers.size()];
+			for (int j = 0; j < answers.size(); j++) {
+				inputValues[answers.get(j).getQuestion().getId()] = answers.get(j).getValue();
 			}
 
 			// Add the values as a training set.
 			trainingDataSet.addRow(inputValues, outputValues);
+		}
+		
+		// TODO remove.
+		for (DataSetRow row : trainingDataSet.getRows()) {
+			
+			for (double d : row.getInput()) {
+				System.out.print(d + " ");
+			}
+			System.out.print(" || ");
+			for (double d : row.getDesiredOutput()) {
+				System.out.print(d + " ");
+			}
+			System.out.println();
 		}
 	}
 

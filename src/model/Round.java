@@ -48,6 +48,7 @@ public class Round {
 	
 	public boolean isGuessUnsure() {
 		
+		// TODO refactor, is slow why?
 		for (int i = 0; i < answers.size(); i++) {
 			
 			if (guessedConcept.getAnswer(answers.get(i).getQuestion()).getValue() != answers.get(i).getValue()) {

@@ -26,6 +26,13 @@ public class Concept {
 		}
 		
 		/**
+		 * Add an answer for the concept.
+		 */
+		public void addAnswer(Answer answer) {
+			answers.add(answer);
+		}
+		
+		/**
 		 * Getter for the name of the concept.
 		 */
 		public String getName() {
