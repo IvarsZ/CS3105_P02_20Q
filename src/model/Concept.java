@@ -1,6 +1,8 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * 
@@ -12,7 +14,7 @@ import java.util.ArrayList;
 public class Concept {
 	
 		private String name;
-		private ArrayList<Answer> answers;
+		private HashMap<Integer, Answer> answers;
 		
 		/**
 		 * Simple constructor.
@@ -22,14 +24,19 @@ public class Concept {
 		 */
 		public Concept(String name, ArrayList<Answer> answers) {
 			this.name = name;
-			this.answers = answers;
+			this.answers = new HashMap<Integer, Answer>();
+			
+			// Add all answers.
+			for (Answer answer : answers) {
+				addAnswer(answer);
+			}
 		}
 		
 		/**
 		 * Add an answer for the concept.
 		 */
 		public void addAnswer(Answer answer) {
-			answers.add(answer);
+			answers.put(answer.getQuestion().getId(), answer);
 		}
 		
 		/**
@@ -37,13 +44,6 @@ public class Concept {
 		 */
 		public String getName() {
 			return name;
-		}
-		
-		/**
-		 * Getter for the answers of this concept.
-		 */
-		public ArrayList<Answer> getAnswers() {
-			return answers;
 		}
 		
 		/**
@@ -56,10 +56,13 @@ public class Concept {
 		public boolean clashes(Concept concept) {
 			
 			// For each answer,
-			for (int i = 0; i < answers.size(); i++) {
+			for (Answer answer : answers.values()) {
 				
 				// if the known answers are different,
-				if (answers.get(i).getValue() != TwentyQuestionsModel.UNKNOWN && concept.getAnswer(answers.get(i).getQuestion()).getValue() != answers.get(i).getValue()) {
+				double answerValue1 = answer.getValue();
+				double answerValue2 = concept.getAnswer(answer.getQuestion()).getValue();
+				if (answerValue1 != TwentyQuestionsModel.UNKNOWN && answerValue2 != TwentyQuestionsModel.UNKNOWN &&
+					answerValue1 != answerValue2) {
 					
 					// there is no clash.
 					return false;
