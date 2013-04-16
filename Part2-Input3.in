@@ -1,0 +1,21 @@
+4
+Has it ever been alive?
+Is it larger than a hand?
+Is it a physical object?
+Is it food?
+7
+Wristwatch
+0 0 1 0
+Candy
+0 0 1 1
+Chair
+0 1 1 0
+Pumpkin
+0 1 1 1
+Ant
+1 0 1 0
+Oyster
+1 0 1 1
+Human
+1 1 0.5 0
+64 100000 0.8 0.8

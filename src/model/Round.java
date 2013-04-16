@@ -70,6 +70,7 @@ public class Round {
 
 		// For each unanswered question.
 		int minScore = Integer.MAX_VALUE;
+		int minScore2 = Integer.MAX_VALUE;
 		Question bestQuestion = null;
 		for (int i = 0; i < unansweredQuestions.size(); i++) {
 			Question question = model.getQuestions().get(unansweredQuestions.get(i));
@@ -84,13 +85,29 @@ public class Round {
 			ArrayList<Concept> possibleNoConcepts = model.possibleConcepts(answers);
 			answers.remove(answers.size() - 1);
 			
-			// Calculate the score, and if it is lower than the current lowest,
+			// TODO check if changes the wrong guess.
+			// If a wrong guess has been made,
+			if (guessedConcept != null && !isGuessCorrect) {
+				
+				// and if one of the answers gives a new guess,
+				if ((possibleYesConcepts.size() == 1 && possibleYesConcepts.get(0) != guessedConcept) ||
+					(possibleYesConcepts.size() == 1 && possibleYesConcepts.get(0) != guessedConcept)) {
+					
+					// pick this question.
+					return question;
+				}
+				
+			}
+			
+			// Calculate the score, and if it is lower than the current lowest or the same and the best outcome is lower,
 			int score = Math.max(possibleYesConcepts.size(), possibleNoConcepts.size());
-			if (score < minScore) {
+			int score2 = Math.min(possibleYesConcepts.size(), possibleNoConcepts.size());
+			if (score < minScore || (score == minScore && score2 < minScore2)) {
 				
 				// update it and the question.
 				bestQuestion = question;
 				minScore = score;
+				minScore2 = score2;
 			}
 		}
 

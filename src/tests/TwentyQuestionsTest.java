@@ -147,5 +147,22 @@ public class TwentyQuestionsTest {
 		// Should have no more questions.
 		assertEquals(null, game.nextQuestion());
 	}
+	
+	@Test
+	public void testQuestionAfterIncorrectGuess() throws IOException {
+		
+		TwentyQuestionsView view = new TwentyQuestionsView("Part2-Input3.in");
+		TwentyQuestionsModel model = view.getModel();
+		
+		// Human should be guessed with only two answers.
+		Round game = new Round(model);
+		game.addAnswer(new Answer(model.getQuestions().get(0), TwentyQuestionsModel.YES));
+		game.addAnswer(new Answer(model.getQuestions().get(1), TwentyQuestionsModel.YES));
+		assertEquals("Human", game.getGuessedConcept().getName());
+		
+		// Set it as incorrect, so should ask if it is a food instead of physical object, to try to exclude it.
+		game.setGuessCorrect(false);
+		assertEquals(model.getQuestions().get(3), game.nextQuestion());
+	}
 
 }
