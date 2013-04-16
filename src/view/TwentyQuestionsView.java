@@ -167,9 +167,9 @@ public class TwentyQuestionsView {
 					Question isGuessCorrectQuestion = new Question("Is my guess correct?", IS_GUESS_CORRECT_QUESTION_ID);
 					if (readAnswer(isGuessCorrectQuestion, in).getValue() == TwentyQuestionsModel.YES) {
 						
-						// mark it and stop the game.
+						// mark it and keep asking extra questions to gather information.
 						game.setGuessCorrect(true);
-						break;
+						System.out.println("Great, please answer extra questions about " + game.getGuessedConcept().getName() + ".");
 					}
 				}
 			}
@@ -190,6 +190,11 @@ public class TwentyQuestionsView {
 							addedConcept.getName() + " has answer yes.", in);
 					q20Model.addQuestion(questionText, game.getGuessedConcept(), addedConcept);
 				}
+			}
+			else {
+				
+				// Otherwise update answers.
+				game.getGuessedConcept().updateAnswers(game.getAnswers());
 			}
 
 			// Ask the user to play again.

@@ -39,6 +39,20 @@ public class Concept {
 			answers.put(answer.getQuestion().getId(), answer);
 		}
 		
+		public void updateAnswers(ArrayList<Answer> answers) {
+			
+			for (Answer answer : answers) {
+				
+				// If the current answer is unknown,
+				Answer currentAnswer = getAnswer(answer.getQuestion());
+				if (currentAnswer.getValue() == TwentyQuestionsModel.UNKNOWN) {
+					
+					// update it.
+					currentAnswer.setValue(answer.getValue());
+				}
+			}
+		}
+		
 		/**
 		 * Getter for the name of the concept.
 		 */

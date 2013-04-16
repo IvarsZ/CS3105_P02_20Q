@@ -11,6 +11,7 @@ import org.neuroph.util.TransferFunctionType;
 public class TwentyQuestionsModel {
 	
 	private static final double MAX_TOTAL_ERROR = 0.0001;
+	private static final int MAXIMUM_NUMBER_OF_RETRIES = 3;
 	
 	public static final double NO = 0;
 	public static final double YES = 1;
@@ -296,11 +297,12 @@ public class TwentyQuestionsModel {
 		lastIterationCount = backProgationRule.getCurrentIteration();
 		
 		// While training keeps timing out,
-		while (timedOut()) {
+		int retries = 0;
+		while (timedOut() && retries < MAXIMUM_NUMBER_OF_RETRIES) {
 			
-			// double the number of hidden units and train again.
+			// increase the number of hidden units 4 times and train again.
 			if (hiddenUnitsCount > 0) {
-				hiddenUnitsCount *= 2;
+				hiddenUnitsCount *= 4;
 			}
 			else {
 				hiddenUnitsCount = 1;
@@ -311,6 +313,8 @@ public class TwentyQuestionsModel {
 			neuralNetwork.randomizeWeights();
 			neuralNetwork.learn(trainingDataSet, backProgationRule);
 			lastIterationCount = backProgationRule.getCurrentIteration();
+			
+			retries++;
 		}
 	}
 
