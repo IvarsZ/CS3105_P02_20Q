@@ -16,7 +16,7 @@ public class TwentyQuestionsModel {
 	public static final double NO = 0;
 	public static final double YES = 1;
 	
-	private static final double UNANSWERED = 0.5; // TODO is it okay to have both equal?
+	private static final double UNANSWERED = 0.5;
 	public static final double UNKNOWN = 0.5;
 
 	private ArrayList<Question> questions;
@@ -100,10 +100,12 @@ public class TwentyQuestionsModel {
 			}
 		}
 		
-		// TODO what if no concept, can it reach such state?
 		return possibleConcepts;
 	}
 	
+	/**
+	 * Adds a concept to the system with the given answers and name.
+	 */
 	public Concept addConcept(String conceptName, ArrayList<Answer> answers) {
 
 		// Add the concept.
@@ -117,6 +119,10 @@ public class TwentyQuestionsModel {
 		return concept;
 	}
 	
+	/**
+	 * Adds a question to the system, it has answer yes to the addedConcept and answer no to the guessedConcept,
+	 * rest are unknown.
+	 */
 	public void addQuestion(String questionText, Concept guessedConcept, Concept addedConcept) {
 
 		// Add question.
@@ -181,6 +187,37 @@ public class TwentyQuestionsModel {
 		return lastIterationCount == maxIterations;
 	}
 	
+	/**
+	 * Hidden unit count getter.
+	 */
+	public int getHiddenUnitCount() {
+		return hiddenUnitsCount;
+	}
+
+	/**
+	 * Max iterations while training getter.
+	 */
+	public int getMaxIterations() {
+		return maxIterations;
+	}
+
+	/**
+	 * Learning rate getter.
+	 */
+	public double getLearningRate() {
+		return learningRate;
+	}
+
+	/**
+	 * Momentum getter.
+	 */
+	public double getMomentum() {
+		return momentum;
+	}
+	
+	/**
+	 * @return true if the answer is rounded to yes.
+	 */
 	private boolean isAnswerYes(double answerValue) {
 		
 		return answerValue >= 0.5; 
@@ -245,7 +282,6 @@ public class TwentyQuestionsModel {
 		}
 
 		// Permute the entry at the given index and make a recursive call.
-		// TODO magic constant dependance.
 		for (double d = 0; d <= 1; d += 0.5) {
 
 			double[] permutatedInput = Arrays.copyOf(input, input.length);

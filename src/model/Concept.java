@@ -39,6 +39,9 @@ public class Concept {
 			answers.put(answer.getQuestion().getId(), answer);
 		}
 		
+		/**
+		 * Update unknow answers with the given ones.
+		 */
 		public void updateAnswers(ArrayList<Answer> answers) {
 			
 			for (Answer answer : answers) {
@@ -67,6 +70,9 @@ public class Concept {
 			return answers.get(question.getId());
 		}
 
+		/**
+		 * @return true if the two concepts cannot be separated by their answers.
+		 */
 		public boolean clashes(Concept concept) {
 			
 			// For each answer,

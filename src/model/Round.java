@@ -16,6 +16,9 @@ public class Round {
 
 	private boolean isGuessCorrect;
 
+	/**
+	 * Constructor from a 20q model.
+	 */
 	public Round(TwentyQuestionsModel model) {
 
 		this.model = model;
@@ -28,11 +31,14 @@ public class Round {
 		unansweredQuestions = new ArrayList<Integer>();
 		for (int i = 0; i < model.getQuestions().size(); i++) {
 
-			// add its index to the list of unasnwered questions.
+			// add its index to the list of unanswered questions.
 			unansweredQuestions.add(model.getQuestions().get(i).getId());
 		}
 	}
 
+	/**
+	 * @return the next question to ask.
+	 */
 	public Question nextQuestion() {
 		
 		// If 20 questions have been answered,
@@ -71,6 +77,9 @@ public class Round {
 		return bestQuestion;
 	}
 
+	/**
+	 * Add an answer.
+	 */
 	public void addAnswer(Answer answer) {
 
 		hasNewGuess = false;
@@ -90,22 +99,37 @@ public class Round {
 		}
 	}
 
+	/**
+	 * Guessed concept getter.
+	 */
 	public Concept getGuessedConcept() {
 		return guessedConcept;
 	}
 
+	/**
+	 * Answers getter.
+	 */
 	public ArrayList<Answer> getAnswers() {
 		return answers;
 	}
 
+	/**
+	 * @return true if the system wants to make a new guess.
+	 */
 	public boolean hasNewGuess() {
 		return hasNewGuess;
 	}
 
+	/**
+	 * @return true if the system guessed correctly.
+	 */
 	public boolean isGuessCorrect() {
 		return isGuessCorrect;
 	}
 
+	/**
+	 * Setter for isGuessCorrect.
+	 */
 	public void setGuessCorrect(boolean isGuessCorrect) {
 		this.isGuessCorrect = isGuessCorrect;
 	}
