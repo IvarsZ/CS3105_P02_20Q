@@ -13,6 +13,7 @@ public class Round {
 
 	private Concept guessedConcept;
 	private boolean hasNewGuess;
+	private ArrayList<Concept> madeGuesses;
 
 	private boolean isGuessCorrect;
 
@@ -34,6 +35,8 @@ public class Round {
 			// add its index to the list of unanswered questions.
 			unansweredQuestions.add(model.getQuestions().get(i).getId());
 		}
+		
+		madeGuesses = new ArrayList<Concept>();
 	}
 
 	/**
@@ -45,6 +48,23 @@ public class Round {
 		if (answers.size() >= QUESTION_LIMIT) {
 			
 			// stop asking.
+			return null;
+		}
+		
+		// If a correct guess has already been made,
+		if (isGuessCorrect) {
+			
+			// pick the first unanswered question with an unknown answer.
+			for (int i = 0; i < unansweredQuestions.size(); i++) {
+				
+				Question question = model.getQuestions().get(unansweredQuestions.get(i));
+				if (guessedConcept.getAnswer(question).getValue() == TwentyQuestionsModel.UNKNOWN) {
+					
+					return question;
+				}
+			}
+			
+			// If all questions are answered stop asking.
 			return null;
 		}
 
@@ -91,10 +111,11 @@ public class Round {
 		ArrayList<Concept> possibleConcepts = model.possibleConcepts(answers);
 		if (possibleConcepts.size() == 1 || answers.size() == QUESTION_LIMIT) {
 
-			if (!possibleConcepts.get(0).equals(guessedConcept)) {
+			if (!possibleConcepts.get(0).equals(guessedConcept) && !madeGuesses.contains(possibleConcepts.get(0))) {
 
 				guessedConcept = possibleConcepts.get(0);
 				hasNewGuess = true;
+				madeGuesses.add(guessedConcept);
 			}
 		}
 	}

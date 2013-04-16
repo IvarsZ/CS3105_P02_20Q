@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import model.Answer;
+import model.Concept;
+import model.Question;
 import model.Round;
 import model.TwentyQuestionsModel;
 
@@ -18,7 +20,7 @@ public class TwentyQuestionsTest {
 	@Test
 	public void testGuessAll() throws IOException {
 
-		TwentyQuestionsView view = new TwentyQuestionsView("Part1-Input1.in");
+		TwentyQuestionsView view = new TwentyQuestionsView("Part2-Input1.in");
 		TwentyQuestionsModel model = view.getModel();
 
 		// Check that all concepts are correctly guessed.
@@ -36,7 +38,7 @@ public class TwentyQuestionsTest {
 	@Test
 	public void addConceptTest() throws IOException {
 
-		TwentyQuestionsView view = new TwentyQuestionsView("Part1-Input1.in");
+		TwentyQuestionsView view = new TwentyQuestionsView("Part2-Input1.in");
 		TwentyQuestionsModel model = view.getModel();
 
 		// Add pig which answers yes to all questions.
@@ -57,82 +59,93 @@ public class TwentyQuestionsTest {
 			assertEquals(concepts[i], game.getGuessedConcept().getName());
 		}
 	}
-
-	/**
-	 * Less questions test.
-	 */
-	/*
+	
 	@Test
-	public void q20Test3() throws FileNotFoundException {
-
-		// Read the twenty questions file, train the network and get output.
-		File inFile = new File("Part1-Input3.in");
-		Scanner in = new Scanner(inFile);
-		TwentyQuestionsModel q20Model = TwentyQuestionsView.read(in);
-		in.close();
-		q20Model.train();
-
-		// Check that all concepts are correctly guessed.
-		assertEquals("Wristwatch", q20Model.guessConcept(new double[]{0, 0, 0}).getName());
-		assertEquals("Candy", q20Model.guessConcept(new double[]{0, 0, 1}).getName());
-		assertEquals("Chair", q20Model.guessConcept(new double[]{0, 1, 0}).getName());
-		assertEquals("Pumpkin", q20Model.guessConcept(new double[]{0, 1, 1}).getName());
-
-		// Even when one of the answers is wrong.
-		assertEquals("Wristwatch", q20Model.guessConcept(new double[]{1, 0, 0}).getName());
-		assertEquals("Candy", q20Model.guessConcept(new double[]{1, 0, 1}).getName());
-		assertEquals("Chair", q20Model.guessConcept(new double[]{1, 1, 0}).getName());
-		assertEquals("Pumpkin", q20Model.guessConcept(new double[]{1, 1, 1}).getName());
+	public void earlyGuessTest() throws IOException {
+		
+		TwentyQuestionsView view = new TwentyQuestionsView("Part2-Input1.in");
+		TwentyQuestionsModel model = view.getModel();
+		
+		// Human should be guessed with only two answers.
+		Round game = new Round(model);
+		game.addAnswer(new Answer(model.getQuestions().get(0), TwentyQuestionsModel.YES));
+		game.addAnswer(new Answer(model.getQuestions().get(1), TwentyQuestionsModel.YES));
+		assertEquals("Human", game.getGuessedConcept().getName());
 	}
-
+	
 	@Test
-	public void addQuestionTest() throws IOException {
+	public void questionPriorityTest() throws IOException {
+		
+		TwentyQuestionsView view = new TwentyQuestionsView("Part2-Input2.in");
+		TwentyQuestionsModel model = view.getModel();
+		
+		// Should ask is larger than a hand as it provides the most separation in eitheir case.
+		Round game = new Round(model);
+		assertEquals(model.getQuestions().get(1), game.nextQuestion());
+		
+		// Answers it, now should ask is it food.
+		game.addAnswer(new Answer(model.getQuestions().get(1), TwentyQuestionsModel.YES));
+		assertEquals(model.getQuestions().get(2), game.nextQuestion());
+	}
+	
+	@Test
+	public void addClashingConceptTest() throws IOException {
 
-		// Read the twenty questions file, train the network and get output.
-		TwentyQuestionsView view = new TwentyQuestionsView("Part1-Input1.in");
-		TwentyQuestionsModel q20Model = view.getModel();
-		q20Model.train();
+		TwentyQuestionsView view = new TwentyQuestionsView("Part2-Input1.in");
+		TwentyQuestionsModel model = view.getModel();
 
-		ArrayList<Question> questions = q20Model.getQuestions();
+		// Cabbage has all the same answers as Pumpkin.
+		Concept pumpkin = model.getConcepts().get(3);
 		ArrayList<Answer> answers = new ArrayList<Answer>();
-		for (int i = 0; i < questions.size(); i++) {
-
-			answers.add(new Answer(questions.get(i), 1));
+		for (int i = 0; i < model.getQuestions().size(); i++) {
+			answers.add(pumpkin.getAnswer(model.getQuestions().get(i)));
 		}
-		q20Model.addConcept("Pig", answers);
-
+		Concept cabbage = model.addConcept("Cabbage", answers);
+		
+		// So there is a clash.
+		assertEquals(true, cabbage.clashes(pumpkin));
+		
+		// Add a question separating them.
+		model.addQuestion("Is it green?", pumpkin, cabbage);
+		
+		// Both can be guessed now.
+		Round game = new Round(model);
+		pumpkin = model.getConcepts().get(3);
 		answers = new ArrayList<Answer>();
-		answers.add(new Answer(questions.get(0), 0));
-		answers.add(new Answer(questions.get(1), 1));
-		answers.add(new Answer(questions.get(2), 1));
-		Concept addedConcept = q20Model.addConcept("Cabbage", answers);
-		q20Model.addQuestion("Is it green?", q20Model.getConcepts().get(3), addedConcept);
-
-		// Check that all concepts are correctly guessed for all possible inputs.
-		assertEquals("Pumpkin", q20Model.guessConcept(new double[]{0, 1, 1, 0}).getName());
-		assertEquals("Cabbage", q20Model.guessConcept(new double[]{0, 1, 1, 1}).getName());
-
-		assertEquals("Pig", q20Model.guessConcept(new double[]{1, 1, 1, 0}).getName());
-		assertEquals("Pig", q20Model.guessConcept(new double[]{1, 1, 1, 1}).getName());
-
-		assertEquals("Chair", q20Model.guessConcept(new double[]{0, 1, 0, 0}).getName());
-		assertEquals("Chair", q20Model.guessConcept(new double[]{0, 1, 0, 1}).getName());
-
-		assertEquals("Wristwatch", q20Model.guessConcept(new double[]{0, 0, 0, 0}).getName());
-		assertEquals("Wristwatch", q20Model.guessConcept(new double[]{0, 0, 0, 1}).getName());
-
-		assertEquals("Candy", q20Model.guessConcept(new double[]{0, 0, 1, 0}).getName());
-		assertEquals("Candy", q20Model.guessConcept(new double[]{0, 0, 1, 1}).getName());
-
-		assertEquals("Ant", q20Model.guessConcept(new double[]{1, 0, 0, 0}).getName());
-		assertEquals("Ant", q20Model.guessConcept(new double[]{1, 0, 0, 1}).getName());
-
-		assertEquals("Oyster", q20Model.guessConcept(new double[]{1, 0, 1, 0}).getName());
-		assertEquals("Oyster", q20Model.guessConcept(new double[]{1, 0, 1, 1}).getName());
-
-		assertEquals("Human", q20Model.guessConcept(new double[]{1, 1, 0, 0}).getName());
-		assertEquals("Human", q20Model.guessConcept(new double[]{1, 1, 0, 1}).getName());
+		for (int i = 0; i < model.getQuestions().size(); i++) {
+			game.addAnswer(pumpkin.getAnswer(model.getQuestions().get(i)));
+		}
+		assertEquals("Pumpkin", game.getGuessedConcept().getName());
+		
+		game = new Round(model);
+		answers = new ArrayList<Answer>();
+		for (int i = 0; i < model.getQuestions().size(); i++) {
+			game.addAnswer(cabbage.getAnswer(model.getQuestions().get(i)));
+		}
+		assertEquals("Cabbage", game.getGuessedConcept().getName());
 	}
-	 */
+	
+	@Test
+	public void gatherInfoTest() throws IOException {
+		
+		// After a correct guess asks the unknow answer question to gather info.
+		TwentyQuestionsView view = new TwentyQuestionsView("Part2-Input2.in");
+		TwentyQuestionsModel model = view.getModel();
+		Round game = new Round(model);
+		
+		// answers that it is not larger than a hand and not food, so guesses it is a wristwatch.
+		Concept wristwatch = model.getConcepts().get(0);
+		game.addAnswer(wristwatch.getAnswer(model.getQuestions().get(1)));
+		game.addAnswer(wristwatch.getAnswer(model.getQuestions().get(2)));
+		assertEquals("Wristwatch", game.getGuessedConcept().getName());
+		game.setGuessCorrect(true);
+		
+		// Now the game asks if it is physical. Answer it.
+		assertEquals(model.getQuestions().get(3), game.nextQuestion());
+		game.addAnswer(new Answer(model.getQuestions().get(3), TwentyQuestionsModel.YES));
+		
+		// Should have no more questions.
+		assertEquals(null, game.nextQuestion());
+	}
 
 }
