@@ -87,8 +87,30 @@ public class TwentyQuestionsView {
 	 * Prints the model of the system.
 	 */
 	public void print() {
-
-		// TODO implement.
+		
+		// Print all questions.
+		int questionCount = q20Model.getQuestions().size();
+		for (int i = 0; i < questionCount; i++) {
+			
+			Question question = q20Model.getQuestions().get(i);
+			System.out.println(question.getId() + ": " + question.getText());
+		}
+		
+		// Print all concepts,
+		for (int i = 0; i < q20Model.getConcepts().size(); i++) {
+			
+			Concept concept = q20Model.getConcepts().get(i);
+			System.out.println(concept.getName());
+			
+			// and their answers to all questions in order.
+			for (int j = 0; j < questionCount; j++) {
+				
+				System.out.print(concept.getAnswer(q20Model.getQuestions().get(j)).getValue() + " ");
+			}
+			System.out.println();
+		}
+		
+		// TODO print parameters, make file reusable for persistence.
 	}
 
 	// TODO move elsewhere.

@@ -16,10 +16,10 @@ public class TwentyQuestions {
 		// TODO cleanup, decide on output.
 		TwentyQuestionsView q20 = new TwentyQuestionsView("Part1-Input1.in");
 		//System.out.println(q20.getModel().timedOut());
-		//q20.print();
+		q20.print();
 		//q20.experimentWithTrainingParameters();
 		//q20.writeNetworkToFile("Part1-Output1.net");
 		q20.play();
-		//q20.print();
+		q20.print();
 	}
 }
