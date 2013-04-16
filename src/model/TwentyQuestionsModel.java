@@ -290,10 +290,28 @@ public class TwentyQuestionsModel {
 		backProgationRule.setMaxIterations(maxIterations);
 		backProgationRule.setLearningRate(learningRate);
 		backProgationRule.setMomentum(momentum);
-
+		
 		// Train and save the iteration count.
 		neuralNetwork.learn(trainingDataSet, backProgationRule);
 		lastIterationCount = backProgationRule.getCurrentIteration();
+		
+		// While training keeps timing out,
+		while (timedOut()) {
+			
+			// double the number of hidden units and train again.
+			if (hiddenUnitsCount > 0) {
+				hiddenUnitsCount *= 2;
+			}
+			else {
+				hiddenUnitsCount = 1;
+			}
+			
+			System.out.println("Increased number of hidden units to " + hiddenUnitsCount);
+			neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, getInputUnitsCount(), hiddenUnitsCount, getOutputUnitsCount());
+			neuralNetwork.randomizeWeights();
+			neuralNetwork.learn(trainingDataSet, backProgationRule);
+			lastIterationCount = backProgationRule.getCurrentIteration();
+		}
 	}
 
 	/**

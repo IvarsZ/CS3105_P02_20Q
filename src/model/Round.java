@@ -3,15 +3,15 @@ package model;
 import java.util.ArrayList;
 
 public class Round {
+	
+	private static final int QUESTION_LIMIT = 20;
 
 	private TwentyQuestionsModel model;
 	private ArrayList<Answer> answers;
 
-	private ArrayList<Integer> unansweredQuestions; 
+	private ArrayList<Integer> unansweredQuestions;
 
 	private Concept guessedConcept;
-	private int nextQuestionId;
-
 	private boolean hasNewGuess;
 
 	private boolean isGuessCorrect;
@@ -34,6 +34,13 @@ public class Round {
 	}
 
 	public Question nextQuestion() {
+		
+		// If 20 questions have been answered,
+		if (answers.size() >= QUESTION_LIMIT) {
+			
+			// stop asking.
+			return null;
+		}
 
 		// For each unanswered question.
 		int minScore = Integer.MAX_VALUE;
@@ -73,7 +80,7 @@ public class Round {
 		unansweredQuestions.remove(unansweredQuestions.indexOf(answer.getQuestion().getId()));
 
 		ArrayList<Concept> possibleConcepts = model.possibleConcepts(answers);
-		if (possibleConcepts.size() == 1) {
+		if (possibleConcepts.size() == 1 || answers.size() == QUESTION_LIMIT) {
 
 			if (!possibleConcepts.get(0).equals(guessedConcept)) {
 
