@@ -85,7 +85,7 @@ public class Round {
 			ArrayList<Concept> possibleNoConcepts = model.possibleConcepts(answers);
 			answers.remove(answers.size() - 1);
 			
-			// TODO check if changes the wrong guess.
+			// TODO check if changes the wrong guess. PERFORMANCE IMPROVER NEEDED.
 			// If a wrong guess has been made,
 			if (guessedConcept != null && !isGuessCorrect) {
 				
